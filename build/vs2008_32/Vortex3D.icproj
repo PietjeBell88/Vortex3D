@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.0"
+	Name="Vortex3D"
+	ProjectGUID="{ED04EEF8-DA35-43D7-AE2B-5FA7BD91E055}"
+	VCNestedProjectGUID="{D4423193-7F06-45F2-BD8A-AEFF115699D4}"
+	VCNestedProjectFileName="Vortex3D.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>
