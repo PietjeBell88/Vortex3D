@@ -1,52 +1,79 @@
-#pragma once
-#define _CRT_SECURE_NO_WARNINGS
-#include "Main.h"
-#include "Emitter.cpp"
-#include "Emitter.h"
-#include "Particle.cpp"
-#include <blitz/array.h>
+// Copyright (c) 2009, Pietje Bell <pietjebell@ana-chan.com>
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Pietje Bell Group nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+
+///////////
+// Headers
+#include "RandomEmitter.h"
 #include "..\external\MTRand.h" 
 
-using namespace std;
-using namespace blitz;
 
-class RandomEmitter : public Emitter {
-protected:
-    double last_emit_time;                            // Relative time at which the last particles were emitted
-public:
-    RandomEmitter(const double &p_density, const double &p_diameter, const double &p_velocity, const string &dimensions, const double &radius, const double &p_rate, const int &reset_particles) : Emitter(p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles) {    // "[double:int:double,double:int:double,double:int:double] <-- relative to R_v
-        last_emit_time = 0;
+///////////////
+// Constructor
+RandomEmitter::RandomEmitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
+              const string &dimensions, const double &radius, const double &p_rate, 
+              const int &reset_particles) : Emitter(p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles) 
+{
+    last_emit_time = 0;
+}
+
+
+//////////////////////////////////////////
+// Particle Property Generators (private)
+Vector3d RandomEmitter::GetStartPos(const int &p) {
+    /* 
+    * This function directly calculates the starting position from the
+    * particle number; this comes in handy when resetting particles, if
+    * they leave the cube, to the position they started;
+    */
+    MTRand myran;
+    double x = delimiter(0,0) + (delimiter(0,1) - delimiter(0,0)) * myran.rand53(); // myran.doub() is in range 0 to 1
+    double y = delimiter(1,0) + (delimiter(1,1) - delimiter(1,0)) * myran.rand53();
+    double z = delimiter(2,0) + (delimiter(2,1) - delimiter(2,0)) * myran.rand53();
+
+    return Vector3d(x,y,z);
+}
+
+Vector3d RandomEmitter::GetStartVel(const int &p) {
+    return Vector3d(0,0,p_velocity);
+}
+
+
+///////////////////////////////////////////
+// Init, Update (public), Reset is default
+void RandomEmitter::Init(ParticleArray *particles) {
+}
+
+void RandomEmitter::Update(const double &relative_time, ParticleArray *particles) {
+    int to_emit = static_cast<int> ( floor((relative_time - last_emit_time)*p_rate ));
+    if (to_emit >= 1) {
+        last_emit_time = relative_time;
     }
-
-    virtual void init(ParticleArray *particles) {
+    while (( particles->GetMaxLength() - particles->GetLength()) >= 1 && to_emit >= 1) {        // 
+        particles->Add( GetStartPos(0), GetStartVel(0), relative_time );
+        to_emit--;
     }
-
-    virtual void update(const double &relative_time, ParticleArray *particles) {
-        int to_emit = static_cast<int> ( floor((relative_time - last_emit_time)*p_rate ));
-        if (to_emit >= 1) {
-            last_emit_time = relative_time;
-        }
-        while (( particles->getMaxLength() - particles->getLength()) >= 1 && to_emit >= 1) {        // 
-            particles->add( getStartPos(0), getStartVel(0), relative_time );
-            to_emit--;
-        }
-    }
-
-    vector3d getStartPos(const int &p) {
-        /* 
-        * This function directly calculates the starting position from the
-        * particle number; this comes in handy when resetting particles, if
-        * they leave the cube, to the position they started;
-        */
-        MTRand myran;
-        double x = delimiter(0,0) + (delimiter(0,1) - delimiter(0,0)) * myran.rand53(); // myran.doub() is in range 0 to 1
-        double y = delimiter(1,0) + (delimiter(1,1) - delimiter(1,0)) * myran.rand53();
-        double z = delimiter(2,0) + (delimiter(2,1) - delimiter(2,0)) * myran.rand53();
-
-        return vector3d(x,y,z);
-    }
-
-    vector3d getStartVel(const int &p) {
-        return vector3d(0,0,p_velocity);
-    }
-};
+}

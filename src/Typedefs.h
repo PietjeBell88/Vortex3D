@@ -27,28 +27,14 @@
 #pragma once
 
 
-//////////
-//Headers
-#include "Emitter.h"
+///////////
+// Headers
+#include <blitz/array.h>
+#include <blitz/tinyvec.h>
+#include <blitz/tinyvec-et.h>
 
-
-///////////////
-// GridEmitter
-class GridEmitter : public Emitter 
-{
-protected:
-    double last_emit_time;      // Relative time at which the last particles were emitted
-
-public:
-    GridEmitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
-        const string &dimensions, const double &radius, const double &p_rate, 
-        const int &reset_particles);
-
-    virtual void Init(ParticleArray *particles);
-    
-    virtual void Update(const double &relative_time, ParticleArray *particles);
-
-    virtual Vector3d GetStartPos(const int &p);
-
-    virtual Vector3d GetStartVel(const int &p);
-};
+////////////
+// Typedefs
+typedef blitz::TinyVector<double,3> Vector3d;
+typedef blitz::Array<Vector3d,3> VectorField;
+typedef blitz::Array<double,3> ScalarField;

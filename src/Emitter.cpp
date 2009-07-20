@@ -1,85 +1,93 @@
-#pragma once
-#define _CRT_SECURE_NO_WARNINGS
-#include "Main.h"
+// Copyright (c) 2009, Pietje Bell <pietjebell@ana-chan.com>
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Pietje Bell Group nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+
+///////////
+// Headers
 #include "Emitter.h"
-#include "Particle.cpp"
-#include <blitz/array.h>
 
-using namespace std;
-using namespace blitz;
 
-class Emitter {
-protected:
-    TinyVector<int,3> p_grid;                        // X x Y x Z grid of particles
-    TinyMatrix<double,3,2> delimiter;                // offsets
-    double dx,dy,dz;                                // delta's
+///////////////
+// Constructor
+Emitter::Emitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
+                 const string &dimensions, const double &radius, const double &p_rate, const int &reset_particles) 
+{    
+    // Save the variables.
+    this->p_density = p_density;
+    this->p_diameter = p_diameter;
+    this->p_velocity = p_velocity;
+    this->reset_particles = reset_particles;
+    this->p_rate = p_rate;
 
-    double p_density;                                // Density of the particles (kg/m3)
-    double p_diameter;                                // Diameter of the particles (m).
-    double p_velocity;
-    double p_rate;
-    int reset_particles;
-    int p_N;                                        // Total amount of particles.
+    // Calculate the delimiter, grid size (p_grid) and the stepsize (dx, dy and dz).
+    double x1,x2,y1,y2,z1,z2;
+    int X,Y,Z;
+    sscanf(dimensions.c_str(),"[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+        &x1,&X,&x2,&y1,&Y,&y2,&z1,&Z,&z2); //e.g. [-4:30:4,0:1:0,4:1:4]"
+    delimiter = x1*radius, x2*radius,
+        y1*radius, y2*radius,
+        z1*radius, z2*radius;
 
-public:
-    Emitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
-        const string &dimensions, const double &radius, const double &p_rate, const int &reset_particles) 
-    {    
-        this->p_density = p_density;
-        this->p_diameter = p_diameter;
-        this->p_velocity = p_velocity;
-        this->reset_particles = reset_particles;
-        this->p_rate = p_rate;
+    // Calculate the grid size.
+    p_grid = X,Y,Z;
+    p_N = product(p_grid);
 
-        double x1,x2,y1,y2,z1,z2;
-        int X,Y,Z;
-        sscanf(dimensions.c_str(),"[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
-            &x1,&X,&x2,&y1,&Y,&y2,&z1,&Z,&z2); //e.g. [-4:30:4,0:1:0,4:1:4]"
-        delimiter = x1*radius, x2*radius,
-            y1*radius, y2*radius,
-            z1*radius, z2*radius;
-
-        p_grid = X,Y,Z;
-        p_N = product(p_grid);
-
+    // Calculate the stepsizes. Avoid dividing by zero.
+    if (p_grid(0) <= 1) {
+        dx = 0;
+    } 
+    else {
         dx = (delimiter(0,1)-delimiter(0,0))/(p_grid(0)-1);
+    }
+    if (p_grid(1) <= 1) {
+        dy = 0;
+    } 
+    else {
         dy = (delimiter(1,1)-delimiter(1,0))/(p_grid(1)-1);
+    }
+    if (p_grid(2) <= 1) {
+        dz = 0;
+    } 
+    else {
         dz = (delimiter(2,1)-delimiter(2,0))/(p_grid(2)-1);
+    }
+}
 
-        if (p_grid(0) <= 1) {
-            dx = 0;
-        }
-        if (p_grid(1) <= 1) {
-            dy = 0;
-        }
-        if (p_grid(2) <= 1) {
-            dz = 0;
-        }
+
+/////////
+// Reset
+double Emitter::Reset(const int &p, const double &relative_time, ParticleArray *particles) 
+{
+    // This is a default Reset() function which probably will not have to be overrided.
+    Particle removed = particles->Remove(p); 
+
+    if (reset_particles != 0) {
+        particles->Add(GetStartPos(p), GetStartVel(p), relative_time);
     }
 
-    virtual void init(ParticleArray *particles) = 0;
+    return (relative_time - removed.GetSpawnTime());
+}
 
-    virtual void update(const double &relative_time, ParticleArray *particles) = 0;
-
-    /*
-     * reset():
-     * In:     - (1) The number of the particle to be reset.
-     *         - (2) The current relative time (as fraction of going around time T_l).
-     * In/Out: - (3) The particlearray of which the particle is to be removed.
-     * Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box. 
-     */
-    virtual double reset(const int &p, const double &relative_time, ParticleArray *particles) 
-    {
-        Particle removed = particles->remove(p);  // The particle that be removed;
-        
-        if (reset_particles != 0) {
-            particles->add(getStartPos(p), getStartVel(p), relative_time);
-        }
-
-        return (relative_time - removed.getSpawnTime());
-    }
-
-    virtual vector3d getStartPos(const int &p) = 0;
-
-    virtual vector3d getStartVel(const int &p) = 0;
-};
