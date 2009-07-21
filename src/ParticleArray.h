@@ -29,8 +29,14 @@
 
 ///////////
 // Headers
-#include "Particle.h"
 #include <blitz/array.h>
+
+#include "Typedefs.h"
+
+
+////////////////////////
+// Forward Declarations
+class Particle;
 
 
 /////////////////
@@ -45,13 +51,13 @@ public:
     // Constructor
     ParticleArray(const int &initiallength);
 
-    Particle &GetParticle(const int &p);
+    Particle &getParticle(const int &p);
 
-    const int GetLength();
+    const int getLength();
 
-    const int GetMaxLength();
+    const int getMaxLength();
 
-    void Add(const Vector3d &pos, const Vector3d &vel, const double &relative_time);
+    void add(const Vector3d &pos, const Vector3d &vel, const double &relative_time);
 
-    Particle Remove(const int &p);
+    Particle remove(const int &p);
 };

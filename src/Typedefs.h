@@ -33,6 +33,7 @@
 #include <blitz/tinyvec.h>
 #include <blitz/tinyvec-et.h>
 
+
 ////////////
 // Typedefs
 typedef blitz::TinyVector<double,3> Vector3d;

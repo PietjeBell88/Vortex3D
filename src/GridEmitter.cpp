@@ -29,6 +29,8 @@
 // Headers
 #include "GridEmitter.h"
 
+#include "ParticleArray.h"
+#include "Particle.h"
 
 ///////////////
 // Constructor
@@ -43,7 +45,7 @@ GridEmitter::GridEmitter(const double &p_density, const double &p_diameter, cons
 
 ////////////////////////////////////////
 // Particle Property Generators (private)
-Vector3d GridEmitter::GetStartPos(const int &p) {
+Vector3d GridEmitter::startPos(const int &p) {
     int i = p/((p_grid(1))*(p_grid(2)));
     int j = ( p % ((p_grid(1))*(p_grid(2))) ) / (p_grid(2)+1);
     int k = p % (p_grid(2));
@@ -51,27 +53,27 @@ Vector3d GridEmitter::GetStartPos(const int &p) {
     return Vector3d(delimiter(0,0)+i*dx,delimiter(1,0)+j*dy,delimiter(2,0)+k*dz);
 }      
 
-Vector3d GridEmitter::GetStartVel(const int &p) {
+Vector3d GridEmitter::startVel(const int &p) {
     return Vector3d(0,0,p_velocity);
 }
 
 
 //////////////////////////////
 // Initializaton and Update
-void GridEmitter::Init(ParticleArray *particles) {
+void GridEmitter::init(ParticleArray *particles) {
     for (int p = 0; p < p_N; p++) {
-        particles->Add( GetStartPos(p), GetStartVel(p), 0 );
+        particles->add( startPos(p), startVel(p), 0 );
     }
 }
 
-void GridEmitter::Update(const double &relative_time, ParticleArray *particles) {
+void GridEmitter::update(const double &relative_time, ParticleArray *particles) {
     // Saving up particles until there are enough saved up to emit in the grid:
-    if ((relative_time - last_emit_time) * p_rate >= p_N && (particles->GetMaxLength() - particles->GetLength()) >= p_N) {        
+    if ((relative_time - last_emit_time) * p_rate >= p_N && (particles->getMaxLength() - particles->getLength()) >= p_N) {        
         last_emit_time = relative_time;
 
         // Emit:
         for (int p = 0; p < p_N; p++) {
-            particles->Add( GetStartPos(p), GetStartVel(p), relative_time );
+            particles->add( startPos(p), startVel(p), relative_time );
         }
     }
 }

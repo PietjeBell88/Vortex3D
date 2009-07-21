@@ -29,6 +29,7 @@
 // Headers
 #include "Vortex.h"
 
+
 ///////////////
 // Constructor
 Vortex::Vortex(const double &radius, const double &velocity, const double &angle, const double &fl_mu, const double &fl_density, const bool &interpolate, const string &roi) {
@@ -76,7 +77,7 @@ Vortex::Vortex(const double &radius, const double &velocity, const double &angle
 // Initialize Interpolation
 // Can't do interpolation initialization in the constructor, results in pure function call.
 // As MSDN says: "Do not call overridable methods in constructors".
-void Vortex::InitInterpolate() {
+void Vortex::initInterpolate() {
     v.resize(grid(0),grid(1),grid(2));                   // The velocity vector field of the vortex.
     accelfluid.resize(grid(0),grid(1),grid(2));          // The acceleration of the surrounding (vortex)fluid
     SetupVortexGrid(&v, &accelfluid);                    // Initialize vortex grid; Note that the function setup only changes v (so doesnt change options).
@@ -85,30 +86,30 @@ void Vortex::InitInterpolate() {
 
 ////////////////////
 // Public Functions
-bool Vortex::OutsideBox(const Vector3d &pos) { 
+bool Vortex::outsideBox(const Vector3d &pos) { 
     if (pos(0) <= delimiter(0,0) || pos(0) > delimiter(0,1) || pos(1) <= delimiter(1,0) || pos(1) > delimiter(1,1) || pos(2) <= delimiter(2,0) || pos(2) > delimiter(2,1)) {
         return true;
     }
     return false;
 }
 
-Vector3d Vortex::GetDuDt(const Vector3d &pos) {
+Vector3d Vortex::getDuDtAt(const Vector3d &pos) {
     if (interpolate == true) {
         return Interpolate3DCube(accelfluid, pos);
     } else {
-        return DuDtAngle(pos);
+        return dudtAngle(pos);
     }
 }
 
-Vector3d Vortex::GetVelocity(const Vector3d &pos) {
+Vector3d Vortex::getVelocityAt(const Vector3d &pos) {
     if (interpolate == true) {
         return Interpolate3DCube(v, pos);
     } else {
-        return VelocityAngle(pos);
+        return velocityAngle(pos);
     }
 }
 
-VectorField Vortex::GetVectorField() { 
+VectorField Vortex::getVectorField() { 
     return v;
 }
 
@@ -180,7 +181,7 @@ Vector3d Vortex::Interpolate3DCube(const VectorField &v, const Vector3d &pos) {
 
 ////////////////////////////////////////
 // Vortex Velocity and Du/Dt Getters  
-Vector3d Vortex::VelocityCarthesian(const Vector3d &pos) {
+Vector3d Vortex::velocityCarthesian(const Vector3d &pos) {
     const double &x = pos(0);
     const double &y = pos(1);
     const double &z = pos(2);
@@ -188,9 +189,9 @@ Vector3d Vortex::VelocityCarthesian(const Vector3d &pos) {
     double r = sqrt(x*x+y*y);
     double phi = atan2(y,x);
 
-    return product(Cil2Cart(phi),VelocityCylinder(r,phi,z));
+    return product(Cil2Cart(phi),velocityCylinder(r,phi,z));
 }
-Vector3d Vortex::DuDtCarthesian(const Vector3d &pos) {
+Vector3d Vortex::dudtCarthesian(const Vector3d &pos) {
     const double &x = pos(0);
     const double &y = pos(1);
     const double &z = pos(2);
@@ -198,14 +199,14 @@ Vector3d Vortex::DuDtCarthesian(const Vector3d &pos) {
     double r = sqrt(x*x+y*y);
     double phi = atan2(y,x);
 
-    return product(Cil2Cart(phi),DuDtCylinder(r,phi,z));
+    return product(Cil2Cart(phi),dudtCylinder(r,phi,z));
 }
 
-Vector3d Vortex::VelocityAngle(const Vector3d &pos) {
-    return product( Rotate_x(angle), VelocityCarthesian( product( Rotate_x(-angle), pos ) ) );
+Vector3d Vortex::velocityAngle(const Vector3d &pos) {
+    return product( Rotate_x(angle), velocityCarthesian( product( Rotate_x(-angle), pos ) ) );
 }
-Vector3d Vortex::DuDtAngle(const Vector3d &pos) {
-    return product( Rotate_x(angle), DuDtCarthesian( product( Rotate_x(-angle), pos ) ) );
+Vector3d Vortex::dudtAngle(const Vector3d &pos) {
+    return product( Rotate_x(angle), dudtCarthesian( product( Rotate_x(-angle), pos ) ) );
 }
 
 
@@ -226,8 +227,8 @@ void Vortex::SetupVortexGrid(VectorField *v, VectorField *accelfluid) {
 
                 // Calculate and set the velocities for each direction in the VectorField
                 // Of course you can't have a negative index, so save each at their index+1
-                (*v)(i,j,k) = VelocityAngle(Vector3d(x,y,z));
-                (*accelfluid)(i,j,k) = DuDtAngle(Vector3d(x,y,z));
+                (*v)(i,j,k) = velocityAngle(Vector3d(x,y,z));
+                (*accelfluid)(i,j,k) = dudtAngle(Vector3d(x,y,z));
             }
         }
     }

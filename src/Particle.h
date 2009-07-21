@@ -27,6 +27,11 @@
 #pragma once
 
 
+///////////
+// Headers
+#include "Typedefs.h"
+
+
 ////////////
 // Particle
 class Particle {
@@ -43,14 +48,14 @@ public:
     Particle(const int &num, const Vector3d &pos, const Vector3d &vel, const double &spawntime);
 
     // Getters and Setters
-    Vector3d &GetPos();
+    Vector3d &getPos();
 
-    Vector3d &GetVel();
+    Vector3d &getVel();
     
-    int &GetNum();
+    int &getNum();
 
     // Other stuff
-    const double GetSpawnTime();
+    const double spawnTime();
 
-    const double GetSpeed();
+    const double speed();
 };

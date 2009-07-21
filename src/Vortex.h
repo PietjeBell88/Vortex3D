@@ -31,11 +31,11 @@
 // Headers
 #include <string.h>
 
-#include "Typedefs.h"
-
 #include <blitz/tinymat.h>
 #include <blitz/tinyvec.h>
 #include <blitz/tinyvec-et.h>
+
+#include "Typedefs.h"
 
 
 /////////////
@@ -83,14 +83,14 @@ protected:
     Vector3d Interpolate3DCube(const VectorField &v, const Vector3d &pos);
 
     // Vortex Velocity and Du/Dt Getters
-    virtual Vector3d VelocityCylinder(const double &r, const double &phi, const double &z) = 0;
-    virtual Vector3d DuDtCylinder(const double &r, const double &phi, const double &z) = 0;
+    virtual Vector3d velocityCylinder(const double &r, const double &phi, const double &z) = 0;
+    virtual Vector3d dudtCylinder(const double &r, const double &phi, const double &z) = 0;
 
-    virtual Vector3d VelocityCarthesian(const Vector3d &pos);
-    virtual Vector3d DuDtCarthesian(const Vector3d &pos);
+    virtual Vector3d velocityCarthesian(const Vector3d &pos);
+    virtual Vector3d dudtCarthesian(const Vector3d &pos);
 
-    virtual Vector3d VelocityAngle(const Vector3d &pos);
-    virtual Vector3d DuDtAngle(const Vector3d &pos);
+    virtual Vector3d velocityAngle(const Vector3d &pos);
+    virtual Vector3d dudtAngle(const Vector3d &pos);
 
     // Vortex Grid Initialization (when interpolating)
     void SetupVortexGrid(VectorField *v, VectorField *accelfluid);
@@ -98,11 +98,11 @@ protected:
 public:
     Vortex(const double &radius, const double &velocity, const double &angle, const double &fl_mu, const double &fl_density, const bool &interpolate, const string &roi);
 
-    void InitInterpolate();
-    bool OutsideBox(const Vector3d &pos);
+    void initInterpolate();
+    bool outsideBox(const Vector3d &pos);
 
     // And just 3 "important" public functions. The rest is private :>
-    Vector3d GetDuDt(const Vector3d &pos);
-    Vector3d GetVelocity(const Vector3d &pos);
-    VectorField GetVectorField();
+    Vector3d getDuDtAt(const Vector3d &pos);
+    Vector3d getVelocityAt(const Vector3d &pos);
+    VectorField getVectorField();
 };

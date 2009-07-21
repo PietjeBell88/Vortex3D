@@ -43,8 +43,8 @@ protected:
     double stretching_z;          // Custom strechting in z-direction.
 
     // The usual functions.
-    virtual Vector3d VelocityCylinder(const double &r, const double &phi, const double &z);
-    virtual Vector3d DuDtCylinder(const double &r, const double &phi, const double &z);
+    virtual Vector3d velocityCylinder(const double &r, const double &phi, const double &z);
+    virtual Vector3d dudtCylinder(const double &r, const double &phi, const double &z);
 
 public:
     BurgersVortex(const string &parameters, const double &radius, const double &velocity,

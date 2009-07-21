@@ -29,6 +29,9 @@
 // Headers
 #include "ParticleArray.h"
 
+#include "Particle.h"
+#include "Typedefs.h"
+
 
 ////////////////////////////////////////
 // Constructor
@@ -41,22 +44,22 @@ ParticleArray::ParticleArray(const int &initiallength) {
 
 ////////////////////////////////////////
 // Getters (and Setters by ref)
-Particle &ParticleArray::GetParticle(const int &p) {
+Particle &ParticleArray::getParticle(const int &p) {
     return particles(p);
 }
 
-const int ParticleArray::GetLength() {
+const int ParticleArray::getLength() {
     return length;
 }
 
-const int ParticleArray::GetMaxLength() {
+const int ParticleArray::getMaxLength() {
     return particles.size();
 }
 
 
 ////////////////////////////////////////
 // Add a particle.
-void ParticleArray::Add(const Vector3d &pos, const Vector3d &vel, const double &relative_time) {
+void ParticleArray::add(const Vector3d &pos, const Vector3d &vel, const double &relative_time) {
     particles(length) = Particle(nextIndex, pos, vel, relative_time);
     length++;
     nextIndex++;
@@ -65,7 +68,7 @@ void ParticleArray::Add(const Vector3d &pos, const Vector3d &vel, const double &
 
 ////////////////////////////////////////
 // Remove a particle.
-Particle ParticleArray::Remove(const int &p) {
+Particle ParticleArray::remove(const int &p) {
     Particle temp = particles(p);
     particles(p) = particles(length-1);                                                    // [ 1 2 3 4 5 ] at length 5, with particle nr 2 (index 1) outside of the box becomes
     length--;                                                                            // [ 1 5 3 4 5 ] with length 4;

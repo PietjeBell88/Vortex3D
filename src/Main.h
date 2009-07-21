@@ -34,13 +34,17 @@
 #include <blitz/tinyvec-et.h>
 
 #include "Typedefs.h"
-#include "ParticleArray.h"
-#include "Vortex.h"
-#include "Emitter.h"
 
 using blitz::TinyVector;
 using blitz::TinyMatrix;
 using std::string;
+
+
+////////////////////////
+// Forward Declarations
+class Emitter;
+class Vortex;
+class ParticleArray;
 
 
 ///////////////////
@@ -61,16 +65,18 @@ struct Settings {
     double dx, dy, dz;
 };
 
+
 /////////////
 // Functions
-void ReadROI(const string &roi, const double &radius, Settings *options);
+void readRoi(const string &roi, const double &radius, Settings *options);
 
-void GetConcentration(ParticleArray *particles, const Settings &options, ScalarField *concentration);
+void getConcentration(ParticleArray *particles, const Settings &options, ScalarField *concentration);
 
-void MoveParticles(Vortex *theVortex, Emitter *theEmitter, ParticleArray *particles, const Settings &options);
-void CheckParticles(Vortex *theVortex, Emitter *theEmitter, ParticleArray *particles, const double &relative_time, double *average_fall_time, double *particles_out);
+void moveParticles(Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles, const Settings &options);
+void checkParticles(Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles, const double &relative_time, double *average_fall_time, double *particles_out);
 
-inline void WriteProgress(int perc);
+inline void writeProgress(int perc);
 
-inline void WriteToFile(const double time, const Settings &options, FILE * f, ParticleArray *particles, Vortex *thevortex);
+inline void writeToFile(const double time, const Settings &options, FILE * f, ParticleArray *particles, Vortex *the_vortex);
+
 

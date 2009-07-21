@@ -46,8 +46,8 @@ BurgersVortex::BurgersVortex(const string &parameters, const double &radius, con
     cout << "alpha: " << alpha << "\n";
     cout << "kappa: " << kappa << "\n";
     if (parameters == "") {
-        this->stretching_r = 1;
-        this->stretching_z = 1;
+        stretching_r = 1;
+        stretching_z = 1;
     } else {
         sscanf(parameters.c_str(),"%lf,%lf",&stretching_r,&stretching_z); //"1,1"
     }
@@ -56,18 +56,18 @@ BurgersVortex::BurgersVortex(const string &parameters, const double &radius, con
 
 /////////////////////////////
 // Vortex Property Functions
-Vector3d BurgersVortex::VelocityCylinder(const double &r, const double &phi, const double &z) {
+Vector3d BurgersVortex::velocityCylinder(const double &r, const double &phi, const double &z) {
     /* check for r == 0, otherwise there's a "divide by zero" and the function
     *  return NaN (inf * 0) */
     return Vector3d(    -alpha * stretching_r * r,
         (r==0) ? 0 : ( kappa / r * (1 - exp(-alpha * r*r/(2*fl_nu))) ),
-        2*stretching_z*alpha*z    );
+        2 * stretching_z * alpha * z    );
 }
 
-Vector3d BurgersVortex::DuDtCylinder(const double &r, const double &phi, const double &z) {
+Vector3d BurgersVortex::dudtCylinder(const double &r, const double &phi, const double &z) {
     /* check for r == 0, otherwise there's a "divide by zero" and the function
     *  return NaN (inf * 0) */
-    return Vector3d(    stretching_r*stretching_r*alpha*alpha*r,
-        (r==0) ? 0 : -( (kappa*alpha*exp(-1/2*alpha*r*r/fl_nu))/fl_nu - (kappa*(1-exp(-1/2*alpha*r*r/fl_nu)))/(r*r) )*stretching_r*alpha*r,
+    return Vector3d(    stretching_r * stretching_r * alpha * alpha * r,
+        (r==0) ? 0 : -( (kappa * alpha * exp(-1/2 * alpha * r*r/fl_nu))/fl_nu - (kappa*(1-exp(-1/2*alpha*r*r/fl_nu)))/(r*r) )*stretching_r*alpha*r,
         4*stretching_z*stretching_z*alpha*alpha*z    );
 }

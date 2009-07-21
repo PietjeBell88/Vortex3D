@@ -29,6 +29,8 @@
 // Headers
 #include "GridOnceEmitter.h"
 
+#include "ParticleArray.h"
+#include "Particle.h"
 
 ////////////////////////////////////////
 // Constructor
@@ -40,7 +42,7 @@ GridOnceEmitter::GridOnceEmitter(const double &p_density, const double &p_diamet
 
 ////////////////////////////////////////
 // Particle Property Generators (private)
-Vector3d GridOnceEmitter::GetStartPos(const int &p) {
+Vector3d GridOnceEmitter::startPos(const int &p) {
     // What variables are used in this function?
 
     /* 
@@ -55,18 +57,18 @@ Vector3d GridOnceEmitter::GetStartPos(const int &p) {
     return Vector3d(delimiter(0,0)+i*dx,delimiter(1,0)+j*dy,delimiter(2,0)+k*dz);
 }
 
-Vector3d GridOnceEmitter::GetStartVel(const int &p) {
+Vector3d GridOnceEmitter::startVel(const int &p) {
     return Vector3d(0,0,p_velocity);
 }
 
 
 ////////////////////////////////////////
 // Init, Update (public), Reset is default
-void GridOnceEmitter::Init(ParticleArray *particles) {
+void GridOnceEmitter::init(ParticleArray *particles) {
     for (int p = 0; p < p_N; p++) {
-        particles->Add( GetStartPos(p), GetStartVel(p), 0 );
+        particles->add( startPos(p), startVel(p), 0 );
     }
 }
 
-void GridOnceEmitter::Update(const double &relative_time, ParticleArray *particles) {
+void GridOnceEmitter::update(const double &relative_time, ParticleArray *particles) {
 }

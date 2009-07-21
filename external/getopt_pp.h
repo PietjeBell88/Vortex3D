@@ -35,7 +35,7 @@ GetOpt_pp:	Yet another C++ version of getopt.
 */
 
 #ifndef GETOPT_INLINE
-#	define GETOPT_INLINE
+#define GETOPT_INLINE
 #endif
 
 namespace GetOpt {
@@ -234,7 +234,7 @@ public:
 	}
 };
 
-
+// Non-defaulted version
 template <class T>
 inline _OptionT<T> Option(char short_opt, const std::string& long_opt, T& target)
 {
@@ -245,6 +245,12 @@ template <class T>
 inline _OptionT<T> Option(char short_opt, T& target)
 {
 	return _OptionT<T>(short_opt, std::string(), target);
+}
+
+template <class T>
+inline _OptionT<T> Option(const std::string& long_opt, T& target)
+{
+	return _OptionT<T>(NULL, long_opt, target);
 }
 
 // Defaulted version
@@ -261,6 +267,12 @@ inline _DefValOption<T, _OptionT<T> > Option(char short_opt, T& target, const T&
 	return _DefValOption<T, _OptionT<T> >(short_opt, std::string(), target, def);
 }
 
+template <class T>
+inline _DefValOption<T, _OptionT<T> > Option(const std::string& long_opt, T& target, const T& def)
+{
+	return _DefValOption<T, _OptionT<T> >(NULL, long_opt, target, def);
+}
+
 // Defaults for strings:
 inline _DefValOption<std::string, _OptionT<std::string> > 
 Option(char short_opt, const std::string& long_opt, std::string& target, const char* def)
@@ -273,6 +285,10 @@ inline _OptionT<std::string> Option(char short_opt, std::string& target, const c
 	return _DefValOption<std::string, _OptionT<std::string> >(short_opt, std::string(), target, def);
 }
 
+inline _OptionT<std::string> Option(const std::string& long_opt, std::string& target, const char* def)
+{
+	return _DefValOption<std::string, _OptionT<std::string> >(NULL, long_opt, target, def);
+}
 
 class OptionPresent : public _Option
 {
@@ -280,7 +296,7 @@ class OptionPresent : public _Option
 	const std::string long_opt;
 	bool* const present;
 public:
-	// two combinations: with/without target, and with/without long opt.
+	// three combinations: with/without target, and with/without long opt, and with/without short opt.
 	
 	// WITH long_opt:
 	OptionPresent(char short_opt, const std::string& long_opt, bool& present)
@@ -291,7 +307,18 @@ public:
 		: short_opt(short_opt), long_opt(long_opt), present(NULL)
 	{}
 	
-	// WITHOUT long_opt:
+
+    // WITHOUT short_opt:
+    OptionPresent(const std::string& long_opt, bool& present)
+		: short_opt(NULL), long_opt(long_opt), present(&present)
+	{}
+
+    OptionPresent(const std::string& long_opt)
+        : short_opt(NULL), long_opt(long_opt), present(NULL)
+    {}
+
+
+    // WITHOUT long_opt:
 	OptionPresent(char short_opt, bool& present)
 		: short_opt(short_opt), present(&present)
 	{}

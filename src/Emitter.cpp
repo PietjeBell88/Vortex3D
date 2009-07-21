@@ -29,6 +29,9 @@
 // Headers
 #include "Emitter.h"
 
+#include "ParticleArray.h"
+#include "Particle.h"
+
 
 ///////////////
 // Constructor
@@ -79,15 +82,15 @@ Emitter::Emitter(const double &p_density, const double &p_diameter, const double
 
 /////////
 // Reset
-double Emitter::Reset(const int &p, const double &relative_time, ParticleArray *particles) 
+double Emitter::reset(const int &p, const double &relative_time, ParticleArray *particles) 
 {
-    // This is a default Reset() function which probably will not have to be overrided.
-    Particle removed = particles->Remove(p); 
+    // This is a default reset() function which probably will not have to be overrided.
+    Particle removed = particles->remove(p); 
 
     if (reset_particles != 0) {
-        particles->Add(GetStartPos(p), GetStartVel(p), relative_time);
+        particles->add(startPos(p), startVel(p), relative_time);
     }
 
-    return (relative_time - removed.GetSpawnTime());
+    return (relative_time - removed.spawnTime());
 }
 
