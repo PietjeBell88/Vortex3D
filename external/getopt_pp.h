@@ -246,12 +246,12 @@ inline _OptionT<T> Option(char short_opt, T& target)
 {
 	return _OptionT<T>(short_opt, std::string(), target);
 }
-
+/*
 template <class T>
 inline _OptionT<T> Option(const std::string& long_opt, T& target)
 {
 	return _OptionT<T>(NULL, long_opt, target);
-}
+}*/
 
 // Defaulted version
 template <class T>
@@ -266,12 +266,12 @@ inline _DefValOption<T, _OptionT<T> > Option(char short_opt, T& target, const T&
 {
 	return _DefValOption<T, _OptionT<T> >(short_opt, std::string(), target, def);
 }
-
+/*
 template <class T>
 inline _DefValOption<T, _OptionT<T> > Option(const std::string& long_opt, T& target, const T& def)
 {
 	return _DefValOption<T, _OptionT<T> >(NULL, long_opt, target, def);
-}
+}*/
 
 // Defaults for strings:
 inline _DefValOption<std::string, _OptionT<std::string> > 
@@ -284,11 +284,11 @@ inline _OptionT<std::string> Option(char short_opt, std::string& target, const c
 {
 	return _DefValOption<std::string, _OptionT<std::string> >(short_opt, std::string(), target, def);
 }
-
+/*
 inline _OptionT<std::string> Option(const std::string& long_opt, std::string& target, const char* def)
 {
 	return _DefValOption<std::string, _OptionT<std::string> >(NULL, long_opt, target, def);
-}
+}*/
 
 class OptionPresent : public _Option
 {
@@ -307,7 +307,7 @@ public:
 		: short_opt(short_opt), long_opt(long_opt), present(NULL)
 	{}
 	
-
+/*
     // WITHOUT short_opt:
     OptionPresent(const std::string& long_opt, bool& present)
 		: short_opt(NULL), long_opt(long_opt), present(&present)
@@ -316,8 +316,8 @@ public:
     OptionPresent(const std::string& long_opt)
         : short_opt(NULL), long_opt(long_opt), present(NULL)
     {}
-
-
+*/
+/*
     // WITHOUT long_opt:
 	OptionPresent(char short_opt, bool& present)
 		: short_opt(short_opt), present(&present)
@@ -326,7 +326,7 @@ public:
 	OptionPresent(char short_opt)
 		: short_opt(short_opt), present(NULL)
 	{}
-	
+	*/
 protected:
 	virtual Result operator() (ShortOptions& short_ops, LongOptions& long_ops, std::ios::fmtflags flags) const
 	{
