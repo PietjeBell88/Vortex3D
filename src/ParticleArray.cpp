@@ -35,8 +35,9 @@
 
 ////////////////////////////////////////
 // Constructor
-ParticleArray::ParticleArray(const int &initiallength) {
-    particles.resize(initiallength);
+ParticleArray::ParticleArray( const int &initiallength )
+{
+    particles.resize( initiallength );
     nextIndex = 0;
     length = 0;
 }
@@ -44,23 +45,28 @@ ParticleArray::ParticleArray(const int &initiallength) {
 
 ////////////////////////////////////////
 // Getters (and Setters by ref)
-Particle &ParticleArray::getParticle(const int &p) {
-    return particles(p);
+Particle &ParticleArray::getParticle( const int &p )
+{
+    return particles( p );
 }
 
-const int ParticleArray::getLength() {
+const int ParticleArray::getLength()
+{
     return length;
 }
 
-const int ParticleArray::getMaxLength() {
+const int ParticleArray::getMaxLength()
+{
     return particles.size();
 }
 
 
 ////////////////////////////////////////
 // Add a particle.
-void ParticleArray::add(const Vector3d &pos, const Vector3d &vel, const double &relative_time) {
-    particles(length) = Particle(nextIndex, pos, vel, relative_time);
+void ParticleArray::add( const Vector3d &pos, const Vector3d &vel,
+                         const double &relative_time )
+{
+    particles( length) = Particle( nextIndex, pos, vel, relative_time );
     length++;
     nextIndex++;
 }
@@ -68,9 +74,10 @@ void ParticleArray::add(const Vector3d &pos, const Vector3d &vel, const double &
 
 ////////////////////////////////////////
 // Remove a particle.
-Particle ParticleArray::remove(const int &p) {
-    Particle temp = particles(p);
-    particles(p) = particles(length-1);                                                    // [ 1 2 3 4 5 ] at length 5, with particle nr 2 (index 1) outside of the box becomes
-    length--;                                                                            // [ 1 5 3 4 5 ] with length 4;
+Particle ParticleArray::remove( const int &p )
+{
+    Particle temp = particles( p );
+    particles( p) = particles( length - 1 ); // [ 1 2 3 4 5 ] at length 5, with particle nr 2 (index 1) outside of the box becomes
+    length--; // [ 1 5 3 4 5 ] with length 4;
     return temp;
 }

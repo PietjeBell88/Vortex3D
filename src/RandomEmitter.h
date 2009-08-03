@@ -34,21 +34,25 @@
 
 /////////////////
 // RandomEmitter
-class RandomEmitter : public Emitter {
+class RandomEmitter : public Emitter
+{
 protected:
     // Relative time at which the last particles were emitted
-    double last_emit_time;                            
+    double last_emit_time;
 
-    virtual Vector3d startPos(const int &p);
+    virtual Vector3d startPos( const int &p );
 
-    virtual Vector3d startVel(const int &p);
+    virtual Vector3d startVel( const int &p );
 
 public:
-    RandomEmitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
-        const string &dimensions, const double &radius, const double &p_rate, 
-        const int &reset_particles);
+    RandomEmitter( const double &p_density, const double &p_diameter,
+                   const double &p_velocity, const string &dimensions,
+                   const double &radius, const double &p_rate,
+                   const int &reset_particles );
 
-    virtual void init(ParticleArray *particles);
+    virtual ~RandomEmitter();
 
-    virtual void update(const double &relative_time, ParticleArray *particles);
+    virtual void init( ParticleArray *particles );
+
+    virtual void update( const double &relative_time, ParticleArray *particles );
 };

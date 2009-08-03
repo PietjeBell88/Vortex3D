@@ -47,28 +47,30 @@ using std::string;
 
 ////////////////
 // Class Vortex
-class Vortex {
+class Vortex
+{
 protected:
     /////////////
     // Variables
-    double angle;        // Angle of the vortex with the z-axis, clockwise when looking along the y-axis in a rh coordinate system.
-    double radius;       // Typical radius of the vortex
-    double velocity;     // Velocity at radius
+    double angle;       // Angle of the vortex with the z-axis, clockwise when looking along the y-axis in a rh coordinate system.
+    double radius;      // Typical radius of the vortex
+    double velocity;    // Velocity at radius
 
-    double fl_mu;        // Fluid Dynamic Viscocity (Pa s).
-    double fl_density;   // Fluid Density (kg/m3).
-    double fl_nu;        // Fluid Kinematic Viscosity (m2/s).
+    double fl_mu;       // Fluid Dynamic Viscocity (Pa s).
+    double fl_density;  // Fluid Density (kg/m3).
+    double fl_nu;       // Fluid Kinematic Viscosity (m2/s).
 
-    bool interpolate;    // true = Interpolate a precalculated grid of the fluid velocity at the position of a particle, false = evaluate fluid velocity functions at particle position
+    bool interpolate;   // true = Interpolate a precalculated grid of the fluid velocity at the position of a particle, false = evaluate fluid velocity functions at particle position
+
 
     ///////////////////////////////////////////////
     // Variables (Only Used when interpolate=true)
-    TinyVector<int,3> grid;             // X x Y x Z grid of particles
-    TinyMatrix<double,3,2> delimiter;   //offsets
+    TinyVector<int, 3> grid;            // X x Y x Z grid of particles
+    TinyMatrix<double, 3, 2> delimiter; //offsets
 
     double dx, dy, dz;                  // Stepsizes of the grid.
 
-    VectorField v;                                                           
+    VectorField v;
     VectorField accelfluid;
 
 
@@ -76,33 +78,39 @@ protected:
     // Functions
 
     // Transformation Matrices
-    TinyMatrix<double, 3, 3> Cil2Cart(const double &phi);
-    TinyMatrix<double, 3, 3> Rotate_x(const double &angle);
+    TinyMatrix<double, 3, 3> Cil2Cart( const double &phi );
+    TinyMatrix<double, 3, 3> Rotate_x( const double &angle );
 
     // Interpolation
-    Vector3d Interpolate3DCube(const VectorField &v, const Vector3d &pos);
+    Vector3d Interpolate3DCube( const VectorField &v, const Vector3d &pos );
 
     // Vortex Velocity and Du/Dt Getters
-    virtual Vector3d velocityCylinder(const double &r, const double &phi, const double &z) = 0;
-    virtual Vector3d dudtCylinder(const double &r, const double &phi, const double &z) = 0;
+    virtual Vector3d velocityCylinder( const double &r, const double &phi,
+                                       const double &z ) = 0;
+    virtual Vector3d dudtCylinder( const double &r, const double &phi,
+                                   const double &z ) = 0;
 
-    virtual Vector3d velocityCarthesian(const Vector3d &pos);
-    virtual Vector3d dudtCarthesian(const Vector3d &pos);
+    virtual Vector3d velocityCarthesian( const Vector3d &pos );
+    virtual Vector3d dudtCarthesian( const Vector3d &pos );
 
-    virtual Vector3d velocityAngle(const Vector3d &pos);
-    virtual Vector3d dudtAngle(const Vector3d &pos);
+    virtual Vector3d velocityAngle( const Vector3d &pos );
+    virtual Vector3d dudtAngle( const Vector3d &pos );
 
     // Vortex Grid Initialization (when interpolating)
-    void SetupVortexGrid(VectorField *v, VectorField *accelfluid);
+    void SetupVortexGrid( VectorField *v, VectorField *accelfluid );
 
 public:
-    Vortex(const double &radius, const double &velocity, const double &angle, const double &fl_mu, const double &fl_density, const bool &interpolate, const string &roi);
+    Vortex( const double &radius, const double &velocity, const double &angle,
+            const double &fl_mu, const double &fl_density,
+            const bool &interpolate, const string &roi );
+
+    virtual ~Vortex();
 
     void initInterpolate();
-    bool outsideBox(const Vector3d &pos);
+    bool outsideBox( const Vector3d &pos );
 
     // And just 3 "important" public functions. The rest is private :>
-    Vector3d getDuDtAt(const Vector3d &pos);
-    Vector3d getVelocityAt(const Vector3d &pos);
+    Vector3d getDuDtAt( const Vector3d &pos );
+    Vector3d getVelocityAt( const Vector3d &pos );
     VectorField getVectorField();
 };

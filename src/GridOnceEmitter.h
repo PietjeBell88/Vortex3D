@@ -34,18 +34,22 @@
 
 ///////////////////
 // GridOnceEmitter
-class GridOnceEmitter : public Emitter {
+class GridOnceEmitter : public Emitter
+{
 protected:
-    Vector3d startPos(const int &p);
+    Vector3d startPos( const int &p );
 
-    Vector3d startVel(const int &p);
+    Vector3d startVel( const int &p );
 
 public:
-    GridOnceEmitter(const double &p_density, const double &p_diameter, const double &p_velocity, 
-        const string &dimensions, const double &radius, const double &p_rate, 
-        const int &reset_particles);
+    GridOnceEmitter( const double &p_density, const double &p_diameter,
+                     const double &p_velocity, const string &dimensions,
+                     const double &radius, const double &p_rate,
+                     const int &reset_particles );
 
-    virtual void init(ParticleArray *particles);
+    virtual ~GridOnceEmitter();
 
-    virtual void update(const double &relative_time, ParticleArray *particles);
+    virtual void init( ParticleArray *particles );
+
+    virtual void update( const double &relative_time, ParticleArray *particles );
 };

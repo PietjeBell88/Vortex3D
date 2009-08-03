@@ -26,7 +26,6 @@
 
 #pragma once
 
-
 ///////////
 // Headers
 #include "Vortex.h"
@@ -34,20 +33,26 @@
 
 /////////////////
 // BurgersVortex
-class BurgersVortex : public Vortex {
+class BurgersVortex : public Vortex
+{
 protected:
     // BurgersVortex Specific Properties
-    double kappa;                 // Determines Strength.
-    double alpha;                 // Determines Stretching.
-    double stretching_r;          // Custom stretching in r-direction.
-    double stretching_z;          // Custom strechting in z-direction.
+    double kappa; // Determines Strength.
+    double alpha; // Determines Stretching.
+    double stretching_r; // Custom stretching in r-direction.
+    double stretching_z; // Custom strechting in z-direction.
 
     // The usual functions.
-    virtual Vector3d velocityCylinder(const double &r, const double &phi, const double &z);
-    virtual Vector3d dudtCylinder(const double &r, const double &phi, const double &z);
+    virtual Vector3d velocityCylinder( const double &r, const double &phi,
+                                       const double &z );
+    virtual Vector3d dudtCylinder( const double &r, const double &phi,
+                                   const double &z );
 
 public:
-    BurgersVortex(const string &parameters, const double &radius, const double &velocity,
-        const double &angle, const double &fl_mu, const double &fl_density, const bool &interpolate, 
-        const string &roi);
+    BurgersVortex( const string &parameters, const double &radius,
+                   const double &velocity, const double &angle,
+                   const double &fl_mu, const double &fl_density,
+                   const bool &interpolate, const string &roi );
+
+    virtual ~BurgersVortex();
 };

@@ -32,11 +32,16 @@
 
 ////////////////
 // Constructors
-Particle::Particle() {
-    pos, vel, num = 0;
+Particle::Particle()
+{
+    pos = 0;
+    vel = 0;
+    num = 0;
 }
 
-Particle::Particle(const int &num, const Vector3d &pos, const Vector3d &vel, const double &spawntime) {
+Particle::Particle( const int &num, const Vector3d &pos, const Vector3d &vel,
+                    const double &spawntime )
+{
     this->num = num;
     this->pos = pos;
     this->vel = vel;
@@ -46,23 +51,28 @@ Particle::Particle(const int &num, const Vector3d &pos, const Vector3d &vel, con
 
 ////////////////////////////////////////
 // Getters and Setters
-Vector3d &Particle::getPos() {
+Vector3d &Particle::getPos()
+{
     return pos;
 }
-Vector3d &Particle::getVel() {
+Vector3d &Particle::getVel()
+{
     return vel;
 }
-int &Particle::getNum() {
+int &Particle::getNum()
+{
     return num;
 }
 
 
 ////////////////////////////////////////
 // Other stuff
-const double Particle::spawnTime() {
+const double Particle::spawnTime()
+{
     return spawntime;
 }
 
-const double Particle::speed() {
-    return sqrt(dot(vel,vel));
+const double Particle::speed()
+{
+    return sqrt( dot( vel, vel ) );
 }

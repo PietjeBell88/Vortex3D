@@ -41,23 +41,25 @@ class Particle;
 
 /////////////////
 // ParticleArray
-class ParticleArray {
+class ParticleArray
+{
 private:
-    int length;                     // Keeps track of how many particles there are.
-    int nextIndex;                  // Contains the index of the next particle when added.
-    blitz::Array<Particle,1> particles;    // The array for the particles.
+    int length; // Keeps track of how many particles there are.
+    int nextIndex; // Contains the index of the next particle when added.
+    blitz::Array<Particle, 1> particles; // The array for the particles.
 
 public:
     // Constructor
-    ParticleArray(const int &initiallength);
+    ParticleArray( const int &initiallength );
 
-    Particle &getParticle(const int &p);
+    Particle &getParticle( const int &p );
 
     const int getLength();
 
     const int getMaxLength();
 
-    void add(const Vector3d &pos, const Vector3d &vel, const double &relative_time);
+    void add( const Vector3d &pos, const Vector3d &vel,
+              const double &relative_time );
 
-    Particle remove(const int &p);
+    Particle remove( const int &p );
 };

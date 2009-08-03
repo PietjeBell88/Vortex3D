@@ -49,18 +49,19 @@ class ParticleArray;
 
 ///////////////////
 // Global Settings
-struct Settings {
+struct Settings
+{
     double systemtime;
     double gravity;
     double dt;
     int reset_particles;
-    double beta;                                    // This ratio is used in the equation of motion
+    double beta; // This ratio is used in the equation of motion
     double tau_a;
     string datafile;
     int outputtype;
     // Used for concentration
-    TinyVector<int,3> grid;    // X x Y x Z grid of resolution
-    TinyMatrix<double,3,2> delimiter; //offsets
+    TinyVector<int, 3> grid; // X x Y x Z grid of resolution
+    TinyMatrix<double, 3, 2> delimiter; //offsets
     bool tecplot;
     double dx, dy, dz;
 };
@@ -68,15 +69,18 @@ struct Settings {
 
 /////////////
 // Functions
-void readRoi(const string &roi, const double &radius, Settings *options);
+void readRoi( const string &roi, const double &radius, Settings *options );
 
-void getConcentration(ParticleArray *particles, const Settings &options, ScalarField *concentration);
+void getConcentration( ParticleArray *particles, const Settings &options,
+                       ScalarField *concentration );
 
-void moveParticles(Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles, const Settings &options);
-void checkParticles(Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles, const double &relative_time, double *average_fall_time, double *particles_out);
+void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
+                    ParticleArray *particles, const Settings &options );
+void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
+                     ParticleArray *particles, const double &relative_time,
+                     double *average_fall_time, double *particles_out );
 
-inline void writeProgress(int perc);
+inline void writeProgress( int perc );
 
-inline void writeToFile(const double time, const Settings &options, FILE * f, ParticleArray *particles, Vortex *the_vortex);
-
-
+inline void writeToFile( const double time, const Settings &options, FILE * f,
+                         ParticleArray *particles, Vortex *the_vortex );

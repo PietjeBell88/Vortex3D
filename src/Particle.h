@@ -34,24 +34,26 @@
 
 ////////////
 // Particle
-class Particle {
+class Particle
+{
 private:
     Vector3d pos;
     Vector3d vel;
     int num;
     double spawntime;
 
-public:    
+public:
     // Constructors
     Particle();
 
-    Particle(const int &num, const Vector3d &pos, const Vector3d &vel, const double &spawntime);
+    Particle( const int &num, const Vector3d &pos, const Vector3d &vel,
+              const double &spawntime );
 
     // Getters and Setters
     Vector3d &getPos();
 
     Vector3d &getVel();
-    
+
     int &getNum();
 
     // Other stuff
