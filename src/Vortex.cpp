@@ -32,9 +32,8 @@
 
 ///////////////
 // Constructor
-Vortex::Vortex( const double &radius, const double &velocity, const double &angle,
-                const double &fl_mu, const double &fl_density,
-                const bool &interpolate, const string &roi )
+Vortex::Vortex( double radius, double velocity, double angle, double fl_mu, 
+			    double fl_density, bool interpolate, const string &roi )
 {
     this->radius = radius;
     this->velocity = velocity;
@@ -127,7 +126,7 @@ VectorField Vortex::getVectorField()
 
 ///////////////////////////////////////////////////////////////////
 // Transformation matrix from [v_r, v_phi, v_z] to [v_x, v_y, v_z]
-TinyMatrix<double, 3, 3> Vortex::Cil2Cart( const double &phi )
+TinyMatrix<double, 3, 3> Vortex::Cil2Cart( double phi )
 {
     TinyMatrix<double, 3, 3> M;
 
@@ -141,7 +140,7 @@ TinyMatrix<double, 3, 3> Vortex::Cil2Cart( const double &phi )
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Rotation matrix for rotation around the x axis ("folding the y-axis to the z-axis")
-TinyMatrix<double, 3, 3> Vortex::Rotate_x( const double &angle )
+TinyMatrix<double, 3, 3> Vortex::Rotate_x( double angle )
 {
     TinyMatrix<double, 3, 3> M;
 

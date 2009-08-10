@@ -50,15 +50,15 @@ private:
 
 public:
     // Constructor
-    ParticleArray( const int &initiallength );
+    ParticleArray( int initiallength );
 
-    Particle &getParticle( const int &p );
+    Particle &getParticle( int p );
 
     const int getLength();
 
     const int getMaxLength();
 
-    void add( const Vector3d &pos, const Vector3d &vel, const double &relative_time );
+    void add( const Vector3d &pos, const Vector3d &vel, double relative_time );
 
-    Particle remove( const int &p );
+    Particle remove( int p );
 };

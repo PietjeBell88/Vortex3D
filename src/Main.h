@@ -69,7 +69,7 @@ struct Settings
 
 /////////////
 // Functions
-void readRoi( const string &roi, const double &radius, Settings *options );
+void readRoi( const string &roi, double radius, Settings *options );
 
 void getConcentration( ParticleArray *particles, const Settings &options,
                        ScalarField *concentration );
@@ -77,10 +77,10 @@ void getConcentration( ParticleArray *particles, const Settings &options,
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                     ParticleArray *particles, const Settings &options );
 void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
-                     ParticleArray *particles, const double &relative_time,
+                     ParticleArray *particles, double relative_time,
                      double *average_fall_time, double *particles_out );
 
 inline void writeProgress( int perc );
 
-inline void writeToFile( const double time, const Settings &options, FILE * f,
+inline void writeToFile( double time, const Settings &options, FILE * f,
                          ParticleArray *particles, Vortex *the_vortex );

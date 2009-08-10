@@ -37,10 +37,9 @@ using std::cout;
 
 ///////////////
 // Constructor
-BurgersVortex::BurgersVortex( const string &parameters, const double &radius,
-                              const double &velocity, const double &angle,
-                              const double &fl_mu, const double &fl_density,
-                              const bool &interpolate, const string &roi ) :
+BurgersVortex::BurgersVortex( const string &parameters, double radius, 
+                              double velocity, double angle, double fl_mu, 
+                              double fl_density, bool interpolate, const string &roi ) :
     Vortex( radius, velocity, angle, fl_mu, fl_density, interpolate, roi )
 {
     //Evaluated LambartW function for alpha
@@ -69,7 +68,7 @@ BurgersVortex::~BurgersVortex() {}
 
 /////////////////////////////
 // Vortex Property Functions
-Vector3d BurgersVortex::velocityCylinder( const double &r, const double &phi, const double &z )
+Vector3d BurgersVortex::velocityCylinder( double r, double phi, double z )
 {
     /* check for r == 0, otherwise there's a "divide by zero" and the function
      *  return NaN (inf * 0) */
@@ -78,7 +77,7 @@ Vector3d BurgersVortex::velocityCylinder( const double &r, const double &phi, co
                      2 * stretching_z * alpha * z );
 }
 
-Vector3d BurgersVortex::dudtCylinder( const double &r, const double &phi, const double &z )
+Vector3d BurgersVortex::dudtCylinder( double r, double phi, double z )
 {
     /* check for r == 0, otherwise there's a "divide by zero" and the function
      *  return NaN (inf * 0) */

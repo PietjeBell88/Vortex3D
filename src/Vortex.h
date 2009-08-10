@@ -78,15 +78,15 @@ protected:
     // Functions
 
     // Transformation Matrices
-    TinyMatrix<double, 3, 3> Cil2Cart( const double &phi );
-    TinyMatrix<double, 3, 3> Rotate_x( const double &angle );
+    TinyMatrix<double, 3, 3> Cil2Cart( double phi );
+    TinyMatrix<double, 3, 3> Rotate_x( double angle );
 
     // Interpolation
     Vector3d Interpolate3DCube( const VectorField &v, const Vector3d &pos );
 
     // Vortex Velocity and Du/Dt Getters
-    virtual Vector3d velocityCylinder( const double &r, const double &phi, const double &z ) = 0;
-    virtual Vector3d dudtCylinder( const double &r, const double &phi, const double &z ) = 0;
+    virtual Vector3d velocityCylinder( double r, double phi, double z ) = 0;
+    virtual Vector3d dudtCylinder( double r, double phi, double z ) = 0;
 
     virtual Vector3d velocityCarthesian( const Vector3d &pos );
     virtual Vector3d dudtCarthesian( const Vector3d &pos );
@@ -98,9 +98,8 @@ protected:
     void SetupVortexGrid( VectorField *v, VectorField *accelfluid );
 
 public:
-    Vortex( const double &radius, const double &velocity, const double &angle,
-            const double &fl_mu, const double &fl_density,
-            const bool &interpolate, const string &roi );
+	Vortex( double radius, double velocity, double angle, double fl_mu, 
+            double fl_density, bool interpolate, const string &roi );
 
     virtual ~Vortex();
 

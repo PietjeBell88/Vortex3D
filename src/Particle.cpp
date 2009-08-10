@@ -38,7 +38,7 @@ Particle::Particle() {
     num = 0;
 }
 
-Particle::Particle( const int &num, const Vector3d &pos, const Vector3d &vel, const double &spawntime )
+Particle::Particle( int num, const Vector3d &pos, const Vector3d &vel, double spawntime )
 {
     this->num = num;
     this->pos = pos;

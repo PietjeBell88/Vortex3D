@@ -41,18 +41,17 @@ protected:
     double last_emit_time; // Relative time at which the last particles were emitted
 
 public:
-    GridEmitter( const double &p_density, const double &p_diameter,
-                 const double &p_velocity, const string &dimensions,
-                 const double &radius, const double &p_rate,
-                 const int &reset_particles );
+    GridEmitter( double p_density, double p_diameter, double p_velocity, 
+                 const string &dimensions, double radius, double p_rate,
+                 int reset_particles );
 
     virtual ~GridEmitter();
 
     virtual void init( ParticleArray *particles );
 
-    virtual void update( const double &relative_time, ParticleArray *particles );
+    virtual void update( double relative_time, ParticleArray *particles );
 
-    virtual Vector3d startPos( const int &p );
+    virtual Vector3d startPos( int p );
 
-    virtual Vector3d startVel( const int &p );
+    virtual Vector3d startVel( int p );
 };

@@ -37,12 +37,10 @@
 
 ///////////////
 // Constructor
-RandomEmitter::RandomEmitter( const double &p_density, const double &p_diameter,
-                              const double &p_velocity,
-                              const string &dimensions, const double &radius,
-                              const double &p_rate, const int &reset_particles ) :
-    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate,
-            reset_particles )
+RandomEmitter::RandomEmitter( double p_density, double p_diameter, double p_velocity, 
+                              const string &dimensions, double radius, double p_rate,
+                              int reset_particles ) :
+    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
 {
     last_emit_time = 0;
 }
@@ -54,7 +52,7 @@ RandomEmitter::~RandomEmitter() {}
 
 //////////////////////////////////////////
 // Particle Property Generators (private)
-Vector3d RandomEmitter::startPos( const int &p )
+Vector3d RandomEmitter::startPos( int p )
 {
     /*
      * This function directly calculates the starting position from the
@@ -70,7 +68,7 @@ Vector3d RandomEmitter::startPos( const int &p )
     return Vector3d( x, y, z );
 }
 
-Vector3d RandomEmitter::startVel( const int &p )
+Vector3d RandomEmitter::startVel( int p )
 {
     return Vector3d( 0, 0, p_velocity );
 }
@@ -80,7 +78,7 @@ Vector3d RandomEmitter::startVel( const int &p )
 // Init, Update (public), Reset is default
 void RandomEmitter::init( ParticleArray *particles ) {}
 
-void RandomEmitter::update( const double &relative_time, ParticleArray *particles )
+void RandomEmitter::update( double relative_time, ParticleArray *particles )
 {
     int to_emit = static_cast<int> ( floor( (relative_time - last_emit_time) * p_rate ) );
 

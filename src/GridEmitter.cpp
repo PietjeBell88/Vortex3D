@@ -35,10 +35,9 @@
 
 ///////////////
 // Constructor
-GridEmitter::GridEmitter( const double &p_density, const double &p_diameter,
-                          const double &p_velocity, const string &dimensions,
-                          const double &radius, const double &p_rate,
-                          const int &reset_particles ) :
+GridEmitter::GridEmitter( double p_density, double p_diameter, double p_velocity, 
+                 const string &dimensions, double radius, double p_rate,
+                 int reset_particles ) :
     Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
 {
     last_emit_time = 0;
@@ -52,7 +51,7 @@ GridEmitter::~GridEmitter() {}
 
 ////////////////////////////////////////
 // Particle Property Generators (private)
-Vector3d GridEmitter::startPos( const int &p )
+Vector3d GridEmitter::startPos( int p )
 {
     int i = p / (( p_grid(1) ) * ( p_grid(2) ));
     int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
@@ -63,7 +62,7 @@ Vector3d GridEmitter::startPos( const int &p )
                      delimiter(2, 0) + k * dz );
 }
 
-Vector3d GridEmitter::startVel( const int &p )
+Vector3d GridEmitter::startVel( int p )
 {
     return Vector3d( 0, 0, p_velocity );
 }
@@ -77,7 +76,7 @@ void GridEmitter::init( ParticleArray *particles )
         particles->add( startPos( p ), startVel( p ), 0 );
 }
 
-void GridEmitter::update( const double &relative_time, ParticleArray *particles )
+void GridEmitter::update( double relative_time, ParticleArray *particles )
 {
     // Saving up particles until there are enough saved up to emit in the grid:
     if ( (relative_time - last_emit_time) * p_rate >= p_N

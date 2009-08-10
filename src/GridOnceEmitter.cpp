@@ -35,12 +35,9 @@
 
 ////////////////////////////////////////
 // Constructor
-GridOnceEmitter::GridOnceEmitter( const double &p_density,
-                                  const double &p_diameter,
-                                  const double &p_velocity,
-                                  const string &dimensions,
-                                  const double &radius, const double &p_rate,
-                                  const int &reset_particles ) :
+GridOnceEmitter::GridOnceEmitter( double p_density, double p_diameter, 
+                                  double p_velocity, const string &dimensions, 
+                                  double radius, double p_rate, int reset_particles ) :
     Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
 {}
 
@@ -52,7 +49,7 @@ GridOnceEmitter::~GridOnceEmitter() {}
 
 ////////////////////////////////////////
 // Particle Property Generators (private)
-Vector3d GridOnceEmitter::startPos(const int &p)
+Vector3d GridOnceEmitter::startPos( int p )
 {
     // What variables are used in this function?
 
@@ -70,7 +67,7 @@ Vector3d GridOnceEmitter::startPos(const int &p)
                      delimiter(2, 0) + k * dz );
 }
 
-Vector3d GridOnceEmitter::startVel( const int &p )
+Vector3d GridOnceEmitter::startVel( int p )
 {
     return Vector3d( 0, 0, p_velocity );
 }
@@ -84,6 +81,5 @@ void GridOnceEmitter::init( ParticleArray *particles )
         particles->add( startPos( p ), startVel( p ), 0 );
 }
 
-void GridOnceEmitter::update( const double &relative_time,
-                              ParticleArray *particles )
+void GridOnceEmitter::update( double relative_time, ParticleArray *particles )
 {}

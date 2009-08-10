@@ -59,7 +59,7 @@ using std::cout;
 
 ////////////
 // Sutaato!
-void readRoi( const string &roi, const double &radius, Settings *options )
+void readRoi( const string &roi, double radius, Settings *options )
 {
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
@@ -165,7 +165,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
 // In/Out: - (3) The particlearray of which the particle is to be removed.
 // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
 void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
-                     ParticleArray *particles, const double &relative_time,
+                     ParticleArray *particles, double relative_time,
                      double *average_fall_time, double *particles_out )
 {
 #pragma omp critical
@@ -205,7 +205,7 @@ inline void writeProgress( int perc )
 }
 
 // TODO: make it "const ParticleArray"
-inline void writeToFile( const double time, const Settings &options, FILE * f,
+inline void writeToFile( double time, const Settings &options, FILE * f,
                          ParticleArray *particles, Vortex *the_vortex )
 {
     static bool first_call = true;
@@ -590,7 +590,7 @@ int main( int argc, char* argv[] )
     the_emitter->init( &particles );
 
     // READY, SET, GO!
-    int max_t = static_cast<int> ( duration * 2 * PI * radius / velocity / options.dt );
+    int max_t = static_cast<int>( duration * 2 * PI * radius / velocity / options.dt );
     double interval = outputinterval;
 
     // Needed to calculate the average fall time.

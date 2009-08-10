@@ -35,10 +35,9 @@
 
 ///////////////
 // Constructor
-Emitter::Emitter( const double &p_density, const double &p_diameter,
-                  const double &p_velocity, const string &dimensions,
-                  const double &radius, const double &p_rate,
-                  const int &reset_particles )
+Emitter::Emitter( double p_density, double p_diameter, double p_velocity, 
+                  const string &dimensions, double radius, double p_rate,
+                  int reset_particles )
 {
     // Save the variables.
     this->p_density = p_density;
@@ -60,7 +59,7 @@ Emitter::Emitter( const double &p_density, const double &p_diameter,
 
     // Calculate the grid size.
     p_grid = X, Y, Z;
-    p_N = product(p_grid);
+    p_N = product( p_grid );
 
     // Calculate the stepsizes. Avoid dividing by zero.
     if ( p_grid(0) <= 1 )
@@ -87,8 +86,7 @@ Emitter::~Emitter() {}
 
 /////////
 // Reset
-double Emitter::reset( const int &p, const double &relative_time,
-                       ParticleArray *particles )
+double Emitter::reset( int p, double relative_time, ParticleArray *particles )
 {
     // This is a default reset() function which probably will not have to be overrided.
     Particle removed = particles->remove( p );

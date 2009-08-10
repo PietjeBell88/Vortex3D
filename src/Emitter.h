@@ -70,26 +70,25 @@ protected:
     int p_N;
 
     // Functions only used local in init(), update() and reset().
-    virtual Vector3d startPos( const int &p ) = 0;
+    virtual Vector3d startPos( int p ) = 0;
 
-    virtual Vector3d startVel( const int &p ) = 0;
+    virtual Vector3d startVel( int p ) = 0;
 
 public:
-    Emitter( const double &p_density, const double &p_diameter,
-             const double &p_velocity, const string &dimensions,
-             const double &radius, const double &p_rate,
-             const int &reset_particles );
+    Emitter( double p_density, double p_diameter, double p_velocity, 
+             const string &dimensions, double radius, double p_rate,
+             int reset_particles );
 
     virtual ~Emitter();
 
     virtual void init( ParticleArray *particles ) = 0;
 
-    virtual void update( const double &relative_time, ParticleArray *particles ) = 0;
+    virtual void update( double relative_time, ParticleArray *particles ) = 0;
 
     // reset():
     // In:     - (1) The number of the particle to be reset.
     //         - (2) The current relative time (as fraction of going around time T_l).
     // In/Out: - (3) The particlearray of which the particle is to be removed.
     // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
-    virtual double reset( const int &p, const double &relative_time, ParticleArray *particles );
+    virtual double reset( int p, double relative_time, ParticleArray *particles );
 };
