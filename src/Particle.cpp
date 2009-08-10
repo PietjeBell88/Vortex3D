@@ -32,15 +32,13 @@
 
 ////////////////
 // Constructors
-Particle::Particle()
-{
+Particle::Particle() {
     pos = 0;
     vel = 0;
     num = 0;
 }
 
-Particle::Particle( const int &num, const Vector3d &pos, const Vector3d &vel,
-                    const double &spawntime )
+Particle::Particle( const int &num, const Vector3d &pos, const Vector3d &vel, const double &spawntime )
 {
     this->num = num;
     this->pos = pos;

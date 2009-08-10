@@ -63,10 +63,9 @@ const int ParticleArray::getMaxLength()
 
 ////////////////////////////////////////
 // Add a particle.
-void ParticleArray::add( const Vector3d &pos, const Vector3d &vel,
-                         const double &relative_time )
+void ParticleArray::add( const Vector3d &pos, const Vector3d &vel, const double &relative_time )
 {
-    particles( length) = Particle( nextIndex, pos, vel, relative_time );
+    particles( length ) = Particle( nextIndex, pos, vel, relative_time );
     length++;
     nextIndex++;
 }
@@ -77,7 +76,7 @@ void ParticleArray::add( const Vector3d &pos, const Vector3d &vel,
 Particle ParticleArray::remove( const int &p )
 {
     Particle temp = particles( p );
-    particles( p) = particles( length - 1 ); // [ 1 2 3 4 5 ] at length 5, with particle nr 2 (index 1) outside of the box becomes
+    particles( p ) = particles( length - 1 ); // [ 1 2 3 4 5 ] at length 5, with particle nr 2 (index 1) outside of the box becomes
     length--; // [ 1 5 3 4 5 ] with length 4;
     return temp;
 }

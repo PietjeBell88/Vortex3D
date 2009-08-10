@@ -84,14 +84,12 @@ public:
 
     virtual void init( ParticleArray *particles ) = 0;
 
-    virtual void
-            update( const double &relative_time, ParticleArray *particles ) = 0;
+    virtual void update( const double &relative_time, ParticleArray *particles ) = 0;
 
     // reset():
     // In:     - (1) The number of the particle to be reset.
     //         - (2) The current relative time (as fraction of going around time T_l).
     // In/Out: - (3) The particlearray of which the particle is to be removed.
     // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
-    virtual double reset( const int &p, const double &relative_time,
-                          ParticleArray *particles );
+    virtual double reset( const int &p, const double &relative_time, ParticleArray *particles );
 };

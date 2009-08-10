@@ -58,8 +58,7 @@ public:
 
     const int getMaxLength();
 
-    void add( const Vector3d &pos, const Vector3d &vel,
-              const double &relative_time );
+    void add( const Vector3d &pos, const Vector3d &vel, const double &relative_time );
 
     Particle remove( const int &p );
 };

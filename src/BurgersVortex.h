@@ -29,11 +29,13 @@
 ///////////
 // Headers
 #include "Vortex.h"
+#include "Typedefs.h"
 
 
 /////////////////
 // BurgersVortex
-class BurgersVortex : public Vortex
+
+class BurgersVortex: public Vortex
 {
 protected:
     // BurgersVortex Specific Properties
@@ -43,10 +45,8 @@ protected:
     double stretching_z; // Custom strechting in z-direction.
 
     // The usual functions.
-    virtual Vector3d velocityCylinder( const double &r, const double &phi,
-                                       const double &z );
-    virtual Vector3d dudtCylinder( const double &r, const double &phi,
-                                   const double &z );
+    virtual Vector3d velocityCylinder( const double &r, const double &phi, const double &z );
+    virtual Vector3d dudtCylinder( const double &r, const double &phi, const double &z );
 
 public:
     BurgersVortex( const string &parameters, const double &radius,

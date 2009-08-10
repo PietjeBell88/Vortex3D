@@ -30,11 +30,12 @@
 //////////
 //Headers
 #include "Emitter.h"
+#include "Typedefs.h"
 
 
 /////////////////
 // RandomEmitter
-class RandomEmitter : public Emitter
+class RandomEmitter: public Emitter
 {
 protected:
     // Relative time at which the last particles were emitted

@@ -25,9 +25,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // TODOLIST
-// error checks on parameters
-// Outputting data in HDF5 or whatever
-// different ways of specifying what the vortex should look like
+// TODO: error checks on parameters
+// TODO: Outputting data in HDF5 or whatever
+// TODO: different ways of specifying what the vortex should look like
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -48,12 +48,14 @@
 #include "ParticleArray.h"
 #include "Particle.h"
 
+
 /////////////
 // Namespace
 using blitz::TinyVector;
 using blitz::TinyMatrix;
 using std::string;
 using std::cout;
+
 
 ////////////
 // Sutaato!
@@ -62,31 +64,29 @@ void readRoi( const string &roi, const double &radius, Settings *options )
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
 
-    sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z,
-            &z2 ); //"[-4:30:4,0:1:0,4:1:4]", also see Emitter
-    options->delimiter = x1 * radius, x2 * radius, y1 * radius, y2 * radius, z1 * radius, z2
-            * radius;
+    sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2,
+            &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
+
+    options->delimiter = x1 * radius, x2 * radius,
+                         y1 * radius, y2 * radius,
+                         z1 * radius, z2 * radius;
     options->grid = X, Y, Z;
 
     TinyVector<int, 3> & grid = options->grid; // readability
     TinyMatrix<double, 3, 2> & delimiter = options->delimiter; //readability
 
-    options->dx = (delimiter( 0, 1 ) - delimiter( 0, 0 )) / (grid( 0 ) - 1);
-    options->dy = (delimiter( 1, 1 ) - delimiter( 1, 0 )) / (grid( 1 ) - 1);
-    options->dz = (delimiter( 2, 1 ) - delimiter( 2, 0 )) / (grid( 2 ) - 1);
+    options->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
+    options->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
+    options->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
 
-    if ( grid( 0 ) <= 1 )
-    {
+    if ( grid(0) <= 1 )
         options->dx = 0;
-    }
-    if ( grid( 1 ) <= 1 )
-    {
+
+    if ( grid(1) <= 1 )
         options->dy = 0;
-    }
-    if ( grid( 2 ) <= 1 )
-    {
+
+    if ( grid(2) <= 1 )
         options->dz = 0;
-    }
 }
 
 // I don't know where this function belongs.. a lot of code comes straight from Vortex.cpp, it even uses its ROI
@@ -103,24 +103,22 @@ void getConcentration( ParticleArray *particles, const Settings &options,
 
     for ( int p = 0; p < length; p++ )
     {
-        const Vector3d & pos = particles->getParticle( p ).getPos();
+        const Vector3d & pos = particles->getParticle(p).getPos();
 
-        int i = static_cast<int> ( floor( (pos( 0 ) - delimiter( 0, 0 )) / dx ) );
-        int j = static_cast<int> ( floor( (pos( 1 ) - delimiter( 1, 0 )) / dy ) );
-        int k = static_cast<int> ( floor( (pos( 2 ) - delimiter( 2, 0 )) / dz ) );
+        int i = static_cast<int> (floor((pos(0) - delimiter(0, 0)) / dx));
+        int j = static_cast<int> (floor((pos(1) - delimiter(1, 0)) / dy));
+        int k = static_cast<int> (floor((pos(2) - delimiter(2, 0)) / dz));
 
-        ++(*concentration)( i, j, k );
+        ++(*concentration)(i, j, k);
     }
+
     if ( sum( *concentration ) != 0 )
-    {
         *concentration = (*concentration) / sum( *concentration );
-    }
 }
 
-void moveParticles( Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles,
-                    const Settings &options )
+void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
+                    ParticleArray *particles, const Settings &options )
 {
-
     // What variables are used in this function, and make some nice reference variables for them to improve readability.
     const double & gravity = options.gravity;
     const double & dt = options.dt;
@@ -143,8 +141,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter, ParticleArray *par
 #pragma omp parallel for
     for ( int p = 0; p < particles->getLength(); p++ )
     {
-
-        Vector3d & p_pos = particles->getParticle( p ).getPos();// Reference variable for readability
+        Vector3d & p_pos = particles->getParticle( p ).getPos(); // Reference variable for readability
         Vector3d & p_vel = particles->getParticle( p ).getVel(); // Reference variable for readability
 
         Vector3d u, dv, v_vel, Du_Dt;
@@ -152,8 +149,8 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter, ParticleArray *par
         v_vel = the_vortex->getVelocityAt( p_pos ); // Calculate the fluid velocity at the position of the particle by either interpolation or evaluation
         Du_Dt = the_vortex->getDuDtAt( p_pos );
 
-        dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5) * Vector3d( 0, 0, gravity )
-                + 1.5 / (beta + 0.5) * Du_Dt) * dt; // equation of motion * dt
+        dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5)
+                * Vector3d( 0, 0, gravity ) + 1.5 / (beta + 0.5) * Du_Dt) * dt; // equation of motion * dt
 
         p_vel = p_vel + dv; // Calculate the new velocity of this particle
         p_pos = p_pos + p_vel * dt; // Calculate the new position of this particle by adding the new velocity multiplied with dt
@@ -167,30 +164,35 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter, ParticleArray *par
 //         - (4) Relative Time, needed for average fall time.
 // In/Out: - (3) The particlearray of which the particle is to be removed.
 // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
-void checkParticles( Vortex *the_vortex, Emitter *the_emitter, ParticleArray *particles,
-                     const double &relative_time, double *average_fall_time, double *particles_out )
+void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
+                     ParticleArray *particles, const double &relative_time,
+                     double *average_fall_time, double *particles_out )
 {
 #pragma omp critical
     {
-
         // For each particle, check if it is outside or at the edge of the box; the
         // edge counts as problematic too because then the interpolation fails.
         int p = 0;
-        while ( p < particles->getLength() )
-        { // loop until there are no more particles left
 
+        // loop until there are no more particles left
+        while ( p < particles->getLength() )
+        {
             const Vector3d & p_pos = particles->getParticle( p ).getPos(); // Reference variable for readability
 
+            // Check if the particle is at the edge, or outside of the box
             if ( the_vortex->outsideBox( p_pos ) )
-            { // Check if the particle is at the edge, or outside of the box
-                double life_time = the_emitter->reset( p, relative_time, particles );
-                (*average_fall_time) = ((*particles_out) * (*average_fall_time) + life_time)
-                        / ((*particles_out) + 1);
+            {
+                double life_time = the_emitter->reset( p, relative_time,
+                        particles );
+                (*average_fall_time) = ((*particles_out) * (*average_fall_time)
+                        + life_time) / ((*particles_out) + 1);
                 ++(*particles_out);
             }
+            // The last particle which was moved to p might also be out-of-range and thus
+            // also has to be checked. Only when nothing was moved can you safely increase p.
             else
-            { // The last particle which was moved to p might also be out-of-range and thus
-                p++; // also has to be checked. Only when nothing was moved can you safely increase p.
+            {
+                p++;
             }
         }
     }
@@ -224,8 +226,8 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
             const double & speed = particles->getParticle( i ).speed();
 
             // Write output to file
-            fprintf( f, "%e     %d     %e     %e     %e     %e\n", time, num, pos( 0 ), pos( 1 ),
-                     pos( 2 ), speed );
+            fprintf( f, "%e     %d     %e     %e     %e     %e\n",
+                     time, num, pos(0), pos(1), pos(2), speed);
         }
         fprintf( f, "\n" );
     }
@@ -245,8 +247,8 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
             const double & speed = particles->getParticle( i ).speed();
 
             // Write output to file
-            fprintf( f, "%e     %d     %e     %e     %e     %e\n", time, num, pos( 0 ), pos( 1 ),
-                     pos( 2 ), speed );
+            fprintf( f, "%e     %d     %e     %e     %e     %e\n",
+                     time, num, pos(0), pos(1), pos(2), speed);
         }
         fprintf( f, "\n" );
     }
@@ -259,19 +261,20 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
             fprintf( f, "#T     X     Y     Z     C\n" );
             first_call = false;
         }
-        ScalarField concentration( options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
-        getConcentration( particles, options, &concentration );
-        for ( int i = 0; i < options.grid( 0 ); i++ )
+        ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
+        getConcentration(particles, options, &concentration);
+
+        for ( int i = 0; i < options.grid(0); i++ )
         {
-            double x = options.delimiter( 0, 0 ) + i * options.dx;
-            for ( int j = 0; j < options.grid( 1 ); j++ )
+            double x = options.delimiter(0, 0) + i * options.dx;
+            for ( int j = 0; j < options.grid(1); j++ )
             {
-                double y = options.delimiter( 1, 0 ) + j * options.dy;
-                for ( int k = 0; k < options.grid( 2 ); k++ )
+                double y = options.delimiter(1, 0) + j * options.dy;
+                for ( int k = 0; k < options.grid(2); k++ )
                 {
-                    double z = options.delimiter( 2, 0 ) + k * options.dz;
-                    fprintf( f, "%e     %e     %e     %e     %e\n", time, x, y, z,
-                             concentration( i, j, k ) );
+                    double z = options.delimiter(2, 0) + k * options.dz;
+                    fprintf( f, "%e     %e     %e     %e     %e\n",
+                             time, x, y, z, concentration(i, j, k));
                 }
             }
         }
@@ -282,28 +285,27 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
     {
         if ( first_call )
         {
-            fprintf(
-                     f,
+            fprintf( f,
                      "TITLE=\"Example: Multi-Zone XY Line Plot Wwith Variable Sharing\"\n \
                       VARIABLES=\"X\" \"Y\" \"Z\" \"C\"\n \
                       ZONE T = \"%f seconds\", I = %d, J = %d, K = %d, DATAPACKING = POINT\n",
-                     time, options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
+                     time, options.grid(0), options.grid(1), options.grid(2) );
             first_call = false;
 
-            ScalarField concentration( options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
+            ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
             getConcentration( particles, options, &concentration );
 
-            for ( int i = 0; i < options.grid( 0 ); i++ )
+            for ( int i = 0; i < options.grid(0); i++ )
             {
-                double x = options.delimiter( 0, 0 ) + i * options.dx;
-                for ( int j = 0; j < options.grid( 1 ); j++ )
+                double x = options.delimiter(0, 0) + i * options.dx;
+                for ( int j = 0; j < options.grid(1); j++ )
                 {
-                    double y = options.delimiter( 1, 0 ) + j * options.dy;
-                    for ( int k = 0; k < options.grid( 2 ); k++ )
+                    double y = options.delimiter(1, 0) + j * options.dy;
+                    for ( int k = 0; k < options.grid(2); k++ )
                     {
-                        double z = options.delimiter( 2, 0 ) + k * options.dz;
-                        fprintf( f, "%e     %e     %e     %e     %e\n", time, x, y, z,
-                                 concentration( i, j, k ) );
+                        double z = options.delimiter(2, 0) + k * options.dz;
+                        fprintf(f, "%e     %e     %e     %e     %e\n",
+                                time, x, y, z, concentration(i, j, k));
                     }
                 }
             }
@@ -312,22 +314,21 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
 
         else
         {
-            fprintf(
-                     f,
+            fprintf( f,
                      "ZONE T = \"%f seconds\", I = %d, J = %d, K = %d, DATAPACKING = POINT\n \
                       VARSHARELIST=([1-3]=1)\n",
-                     time, options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
+                     time, options.grid(0), options.grid(1), options.grid(2) );
 
-            ScalarField concentration( options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
+            ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
             getConcentration( particles, options, &concentration );
 
-            for ( int i = 0; i < options.grid( 0 ); i++ )
+            for ( int i = 0; i < options.grid(0); i++ )
             {
-                for ( int j = 0; j < options.grid( 1 ); j++ )
+                for ( int j = 0; j < options.grid(1); j++ )
                 {
-                    for ( int k = 0; k < options.grid( 2 ); k++ )
+                    for ( int k = 0; k < options.grid(2); k++ )
                     {
-                        fprintf( f, "%e\n", concentration( i, j, k ) );
+                        fprintf( f, "%e\n", concentration(i, j, k) );
                     }
                 }
             }
@@ -346,18 +347,19 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
         }
         const VectorField &v = the_vortex->getVectorField();
 
-        for ( int i = 0; i < options.grid( 0 ); i++ )
+        for ( int i = 0; i < options.grid(0); i++ )
         {
-            double x = options.delimiter( 0, 0 ) + i * options.dx;
-            for ( int j = 0; j < options.grid( 1 ); j++ )
+            double x = options.delimiter(0, 0) + i * options.dx;
+            for ( int j = 0; j < options.grid(1); j++ )
             {
-                double y = options.delimiter( 1, 0 ) + j * options.dy;
-                for ( int k = 0; k < options.grid( 2 ); k++ )
+                double y = options.delimiter(1, 0) + j * options.dy;
+                for ( int k = 0; k < options.grid(2); k++ )
                 {
-                    double z = options.delimiter( 2, 0 ) + k * options.dz;
-                    const Vector3d &vel = v( i, j, k );
-                    fprintf( f, "%e     %e     %e     %e     %e     %e     %e\n", time, x, y, z,
-                             vel( 0 ), vel( 1 ), vel( 2 ) );
+                    double z = options.delimiter(2, 0) + k * options.dz;
+                    const Vector3d &vel = v(i, j, k);
+                    fprintf( f,
+                             "%e     %e     %e     %e     %e     %e     %e\n",
+                             time, x, y, z, vel(0), vel(1), vel(2) );
                 }
             }
         }
@@ -369,26 +371,25 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
     {
         if ( first_call )
         {
-            fprintf(
-                     f,
+            fprintf( f,
                      "TITLE=\"Simple Data File\"\nVARIABLES=\"X\" \"Y\" \"Z\" \"UX\" \"UY\" \"UZ\"\nZONE I = %d, J = %d, K = %d, DATAPACKING = POINT\n",
-                     options.grid( 0 ), options.grid( 1 ), options.grid( 2 ) );
+                     options.grid(0), options.grid(1), options.grid(2) );
             first_call = false;
         }
         const VectorField &v = the_vortex->getVectorField();
 
-        for ( int i = 0; i < options.grid( 0 ); i++ )
+        for ( int i = 0; i < options.grid(0); i++ )
         {
-            double x = options.delimiter( 0, 0 ) + i * options.dx;
-            for ( int j = 0; j < options.grid( 1 ); j++ )
+            double x = options.delimiter(0, 0) + i * options.dx;
+            for ( int j = 0; j < options.grid(1); j++ )
             {
-                double y = options.delimiter( 1, 0 ) + j * options.dy;
-                for ( int k = 0; k < options.grid( 2 ); k++ )
+                double y = options.delimiter(1, 0) + j * options.dy;
+                for ( int k = 0; k < options.grid(2); k++ )
                 {
-                    double z = options.delimiter( 2, 0 ) + k * options.dz;
-                    const Vector3d &vel = v( i, j, k );
-                    fprintf( f, "%e     %e     %e     %e     %e     %e\n", x, y, z, vel( 0 ),
-                             vel( 1 ), vel( 2 ) );
+                    double z = options.delimiter(2, 0) + k * options.dz;
+                    const Vector3d &vel = v(i, j, k);
+                    fprintf( f, "%e     %e     %e     %e     %e     %e\n",
+                             x, y, z, vel(0), vel(1), vel(2) );
                 }
             }
         }
@@ -398,9 +399,11 @@ inline void writeToFile( const double time, const Settings &options, FILE * f,
     else
     {
         cout << "Invalid output method.";
-        exit( 1 );
+        exit(1);
     }
 }
+
+
 void show_help()
 {
     printf(
@@ -448,8 +451,8 @@ Particle/Emitter Properties:\
 int main( int argc, char* argv[] )
 {
     int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype;
-    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density, duration, p_velocity,
-            outputinterval, dtscale, p_rate;
+    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
+           duration, p_velocity, outputinterval, dtscale, p_rate;
     bool interpolate;
     string parameters, roi, dimensions, datafile;
 
@@ -457,7 +460,7 @@ int main( int argc, char* argv[] )
     using GetOpt::Option;
     using GetOpt::OptionPresent;
 
-    GetOpt_pp ops( argc, argv );
+    GetOpt_pp ops(argc, argv);
 
     if ( ops >> OptionPresent( 'h', "help" ) )
     {
@@ -465,30 +468,30 @@ int main( int argc, char* argv[] )
         exit( 1 );
     }
 
-    ops >> Option('a', "vortextype", vortextype, 1)
-        >> Option('a', "radius", radius, 0.1)
-        >> Option('a', "velocity", velocity, 0.001)
-        >> Option('a', "parameters", parameters, "")
-        >> Option('a', "angle", angle, 0.0)
-        >> Option('a', "roi", roi, "[-5:101:5,-5:101:5,-5:101:5]")
-        >> Option('a', "emittertype", emittertype, 1)
-        >> Option('a', "dimensions", dimensions, "[-4:30:4,0:1:0,4:1:4]")
-        >> Option('a', "p_rate", p_rate, 100.0)
-        >> Option('a', "p_density", p_density, 1000.0)
-        >> Option('a', "p_diameter", p_diameter, 5E-5)
-        >> Option('a', "fl_mu", fl_mu, 18E-6)
-        >> Option('a', "fl_density", fl_density, 1.0)
-        >> Option('a', "p_velocity", p_velocity, 0.0)
-        >> Option('a', "reset_particles", reset_particles, 0)
-        >> Option('a', "datafile", datafile, "test.txt")
-        >> Option('a', "outputtype", outputtype, 1)
-        >> Option('a', "outputinterval", outputinterval, 0.0)
-        >> OptionPresent('a', "interpolate", interpolate)
-        >> Option('a', "duration", duration, 1.0)
-        >> Option('a', "maxparticles", maxparticles, 1000)
-        >> Option('a', "gravity", grav, 1)
-        >> Option('a', "dtscale", dtscale, 0.5)
-    ;
+    ops >> Option( 'a', "vortextype", vortextype, 1 )
+        >> Option( 'a', "radius", radius, 0.1 )
+        >> Option( 'a', "velocity", velocity, 0.001 )
+        >> Option( 'a', "parameters", parameters, "" )
+        >> Option( 'a', "angle", angle, 0.0 )
+        >> Option( 'a', "roi", roi, "[-5:101:5,-5:101:5,-5:101:5]" )
+        >> Option( 'a', "emittertype", emittertype, 1 )
+        >> Option( 'a', "dimensions", dimensions, "[-4:30:4,0:1:0,4:1:4]" )
+        >> Option( 'a', "p_rate", p_rate, 100.0 )
+        >> Option( 'a', "p_density", p_density, 1000.0 )
+        >> Option( 'a', "p_diameter", p_diameter, 5E-5 )
+        >> Option( 'a', "fl_mu", fl_mu, 18E-6 )
+        >> Option( 'a', "fl_density", fl_density, 1.0 )
+        >> Option( 'a', "p_velocity", p_velocity, 0.0 )
+        >> Option( 'a', "reset_particles", reset_particles, 0 )
+        >> Option( 'a', "datafile", datafile, "test.txt" )
+        >> Option( 'a', "outputtype", outputtype, 1 )
+        >> Option( 'a', "outputinterval", outputinterval, 0.0 )
+        >> OptionPresent( 'a', "interpolate", interpolate )
+        >> Option( 'a', "duration", duration, 1.0 )
+        >> Option( 'a', "maxparticles", maxparticles, 1000 )
+        >> Option( 'a', "gravity", grav, 1 )
+        >> Option( 'a', "dtscale", dtscale, 0.5 )
+     ;
 
     //gedoe
     Settings options;
@@ -508,40 +511,41 @@ int main( int argc, char* argv[] )
     // Parameter Checking:
     // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
     if ( outputtype == 3 )
-    {
         interpolate = true;
-    }
 
     // In case of the GridEmitters (1 and 2) maxparticles should be at least the size of one grid.
     if ( emittertype == 1 || emittertype == 2 )
     {
         double x1, x2, y1, y2, z1, z2;
         int X, Y, Z;
-        sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2, &y1, &Y,
-                &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
+
+
+        sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+                &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
+
         int p_N = X * Y * Z;
+
         if ( maxparticles < p_N )
-        {
             maxparticles = p_N;
-        }
     }
 
     FILE * stat = fopen( datafile.c_str(), "w" );
     fprintf(
              stat,
-             "#Settings: vortextype %d, radius %e, velocity %e, parameters \"%s\", angle %e, roi \"%s\", emittertype %d",
-             vortextype, radius, velocity, parameters.c_str(), angle, roi.c_str(), emittertype );
-    fprintf(
-             stat,
-             ", dimensions \"%s\", p_rate %e, p_density %e, p_diameter %e, fl_mu %e, fl_density %e, p_velocity %e",
-             dimensions.c_str(), p_rate, p_density, p_diameter, fl_mu, fl_density, p_velocity );
-    fprintf(
-             stat,
-             ", reset_particles %d, datafile \"%s\", outputtype %d, outputinterval %e, interpolate %d, duration %e, maxparticles %d, gravity %d\n",
-             reset_particles, datafile.c_str(), outputtype, outputinterval, interpolate, duration,
-             maxparticles, grav );
-    fprintf( stat, "#Other: Systemtime %e, TerminalVelocity %e\n", options.systemtime, (1 - (1
-            / options.beta)) * options.systemtime * -9.81 );
+             "#Settings: vortextype %d, radius %e, velocity %e, parameters \"%s\" \
+             , angle %e, roi \"%s\", emittertype %d, dimensions \"%s\", p_rate %e \
+             , p_density %e, p_diameter %e, fl_mu %e, fl_density %e, p_velocity %e \
+             , reset_particles %d, datafile \"%s\", outputtype %d, outputinterval %e \
+             , interpolate %d, duration %e, maxparticles %d, gravity %d\n",
+             vortextype, radius, velocity, parameters.c_str(),
+             angle, roi.c_str(), emittertype, dimensions.c_str(), p_rate,
+             p_density, p_diameter, fl_mu, fl_density, p_velocity,
+             reset_particles, datafile.c_str(), outputtype, outputinterval,
+             interpolate, duration, maxparticles, grav );
+
+    fprintf( stat, "#Other: Systemtime %e, TerminalVelocity %e\n",
+             options.systemtime, (1 - (1 / options.beta)) * options.systemtime * -9.81 );
+
     fclose( stat );
 
     // Making the Vortex
@@ -549,40 +553,32 @@ int main( int argc, char* argv[] )
 
     if ( vortextype == 1 )
     {
-        the_vortex = new BurgersVortex( parameters, radius, velocity, angle, fl_mu, fl_density,
-                                        interpolate, roi );
+        the_vortex = new BurgersVortex( parameters, radius, velocity, angle,
+                fl_mu, fl_density, interpolate, roi );
     }
     else
     {
         cout << "Unknown Vortex type";
-        exit( 1 );
+        exit(1);
     }
 
     // See the comment at initInterpolate() as to why this is here.
     if ( interpolate == true )
-    {
         the_vortex->initInterpolate();
-    }
 
     // Making the Emitter
     //GridOnceEmitter tempEmitter(p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles);
     Emitter * the_emitter;
 
     if ( emittertype == 1 )
-    {
-        the_emitter = new GridOnceEmitter( p_density, p_diameter, p_velocity, dimensions, radius,
-                                           p_rate, reset_particles );
-    }
+        the_emitter = new GridOnceEmitter( p_density, p_diameter, p_velocity,
+                dimensions, radius, p_rate, reset_particles );
     else if ( emittertype == 2 )
-    {
-        the_emitter = new GridEmitter( p_density, p_diameter, p_velocity, dimensions, radius,
-                                       p_rate, reset_particles );
-    }
+        the_emitter = new GridEmitter( p_density, p_diameter, p_velocity,
+                dimensions, radius, p_rate, reset_particles );
     else if ( emittertype == 3 )
-    {
-        the_emitter = new RandomEmitter( p_density, p_diameter, p_velocity, dimensions, radius,
-                                         p_rate, reset_particles );
-    }
+        the_emitter = new RandomEmitter( p_density, p_diameter, p_velocity,
+                dimensions, radius, p_rate, reset_particles );
     else
     {
         cout << "Unknown Emitter type";
@@ -594,8 +590,7 @@ int main( int argc, char* argv[] )
     the_emitter->init( &particles );
 
     // READY, SET, GO!
-    int max_t = static_cast<int> ( duration * 2 * 3.14159265359289783238 * radius / velocity
-            / options.dt );
+    int max_t = static_cast<int> ( duration * 2 * PI * radius / velocity / options.dt );
     double interval = outputinterval;
 
     // Needed to calculate the average fall time.
@@ -615,38 +610,38 @@ int main( int argc, char* argv[] )
         exit( 0 );
     }
 
+    // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
     for ( t = 1; t <= max_t; t++ )
-    { // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
+    {
         double relative_time = t * duration / max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
         double time = (t * options.dt) / max_t; // Absolute time in seconds.
 
         writeProgress( (t * 100) / max_t ); // Display progress on stdout, e.g. [45%]
 
-        // move the particles
+        // Move the particles
         moveParticles( the_vortex, the_emitter, &particles, options ); // Move the particles, and keep track of how many particles remain inside the box.
-        checkParticles( the_vortex, the_emitter, &particles, relative_time, &average_fall_time,
-                        &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
+        checkParticles( the_vortex, the_emitter, &particles, relative_time,
+                &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
 
-        // write to file
+        // Write to file
         if ( relative_time > interval )
-        { //
+        {
             writeToFile( time, options, f, &particles, the_vortex );
             interval += outputinterval;
         }
 
         the_emitter->update( relative_time, &particles );
 
+        // Break when there are no more particles to plot.
         if ( particles.getLength() == 0 )
-        {
             break;
-        } // Break when there are no more particles to plot
 
     }
 
     fprintf(
-             f,
-             "\n# Amount of particles that left the box: %e\n# Mean amount of time the particles spent in the box:%e",
-             particles_out, average_fall_time );
+            f,
+            "\n# Amount of particles that left the box: %e\n# Mean amount of time the particles spent in the box:%e",
+            particles_out, average_fall_time );
     fclose( f );
     delete the_vortex;
     delete the_emitter;

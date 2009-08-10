@@ -39,8 +39,7 @@ GridEmitter::GridEmitter( const double &p_density, const double &p_diameter,
                           const double &p_velocity, const string &dimensions,
                           const double &radius, const double &p_rate,
                           const int &reset_particles ) :
-    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate,
-             reset_particles )
+    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
 {
     last_emit_time = 0;
 }
@@ -48,21 +47,20 @@ GridEmitter::GridEmitter( const double &p_density, const double &p_diameter,
 
 //////////////
 // Destructor
-GridEmitter::~GridEmitter()
-{
-}
+GridEmitter::~GridEmitter() {}
 
 
 ////////////////////////////////////////
 // Particle Property Generators (private)
 Vector3d GridEmitter::startPos( const int &p )
 {
-    int i = p / ((p_grid( 1 )) * (p_grid( 2 )));
-    int j = (p % ((p_grid( 1 )) * (p_grid( 2 )))) / (p_grid( 2 ) + 1);
-    int k = p % (p_grid( 2 ));
+    int i = p / (( p_grid(1) ) * ( p_grid(2) ));
+    int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
+    int k = p % ( p_grid(2) );
 
-    return Vector3d( delimiter( 0, 0 ) + i * dx, delimiter( 1, 0 ) + j * dy,
-                     delimiter( 2, 0 ) + k * dz );
+    return Vector3d( delimiter(0, 0) + i * dx,
+                     delimiter(1, 0) + j * dy,
+                     delimiter(2, 0) + k * dz );
 }
 
 Vector3d GridEmitter::startVel( const int &p )
@@ -76,9 +74,7 @@ Vector3d GridEmitter::startVel( const int &p )
 void GridEmitter::init( ParticleArray *particles )
 {
     for ( int p = 0; p < p_N; p++ )
-    {
         particles->add( startPos( p ), startVel( p ), 0 );
-    }
 }
 
 void GridEmitter::update( const double &relative_time, ParticleArray *particles )
@@ -91,8 +87,6 @@ void GridEmitter::update( const double &relative_time, ParticleArray *particles 
 
         // Emit:
         for ( int p = 0; p < p_N; p++ )
-        {
             particles->add( startPos( p ), startVel( p ), relative_time );
-        }
     }
 }

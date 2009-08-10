@@ -30,11 +30,12 @@
 //////////
 //Headers
 #include "Emitter.h"
+#include "Typedefs.h"
 
 
 ///////////////////
 // GridOnceEmitter
-class GridOnceEmitter : public Emitter
+class GridOnceEmitter: public Emitter
 {
 protected:
     Vector3d startPos( const int &p );

@@ -50,48 +50,39 @@ Emitter::Emitter( const double &p_density, const double &p_diameter,
     // Calculate the delimiter, grid size (p_grid) and the stepsize (dx, dy and dz).
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
-    sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X,
-            &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
-    delimiter = x1 * radius, x2 * radius, y1 * radius, y2 * radius, z1 * radius, z2
-            * radius;
+
+    sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+            &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
+
+    delimiter = x1 * radius, x2 * radius,
+                y1 * radius, y2 * radius,
+                z1 * radius, z2 * radius;
 
     // Calculate the grid size.
     p_grid = X, Y, Z;
-    p_N = product( p_grid );
+    p_N = product(p_grid);
 
     // Calculate the stepsizes. Avoid dividing by zero.
-    if ( p_grid( 0 ) <= 1 )
-    {
+    if ( p_grid(0) <= 1 )
         dx = 0;
-    }
     else
-    {
-        dx = (delimiter( 0, 1 ) - delimiter( 0, 0 )) / (p_grid( 0 ) - 1);
-    }
-    if ( p_grid( 1 ) <= 1 )
-    {
+        dx = (delimiter(0, 1) - delimiter(0, 0)) / (p_grid(0) - 1);
+
+    if ( p_grid(1) <= 1 )
         dy = 0;
-    }
     else
-    {
-        dy = (delimiter( 1, 1 ) - delimiter( 1, 0 )) / (p_grid( 1 ) - 1);
-    }
-    if ( p_grid( 2 ) <= 1 )
-    {
+        dy = (delimiter(1, 1) - delimiter(1, 0)) / (p_grid(1) - 1);
+
+    if ( p_grid(2) <= 1 )
         dz = 0;
-    }
     else
-    {
-        dz = (delimiter( 2, 1 ) - delimiter( 2, 0 )) / (p_grid( 2 ) - 1);
-    }
+        dz = (delimiter(2, 1) - delimiter(2, 0)) / (p_grid(2) - 1);
 }
 
 
 //////////////
 // Destructor
-Emitter::~Emitter()
-{
-}
+Emitter::~Emitter() {}
 
 
 /////////
@@ -103,9 +94,7 @@ double Emitter::reset( const int &p, const double &relative_time,
     Particle removed = particles->remove( p );
 
     if ( reset_particles != 0 )
-    {
         particles->add( startPos( p ), startVel( p ), relative_time );
-    }
 
     return (relative_time - removed.spawnTime());
 }

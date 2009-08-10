@@ -26,14 +26,16 @@
 
 #pragma once
 
+
 //////////
 //Headers
 #include "Emitter.h"
+#include "Typedefs.h"
 
 
 ///////////////
 // GridEmitter
-class GridEmitter : public Emitter
+class GridEmitter: public Emitter
 {
 protected:
     double last_emit_time; // Relative time at which the last particles were emitted

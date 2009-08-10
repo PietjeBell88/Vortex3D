@@ -65,10 +65,10 @@ protected:
 
     ///////////////////////////////////////////////
     // Variables (Only Used when interpolate=true)
-    TinyVector<int, 3> grid;            // X x Y x Z grid of particles
-    TinyMatrix<double, 3, 2> delimiter; //offsets
+    TinyVector<int, 3> grid;             // X x Y x Z grid of particles
+    TinyMatrix<double, 3, 2> delimiter;  //offsets
 
-    double dx, dy, dz;                  // Stepsizes of the grid.
+    double dx, dy, dz;                   // Stepsizes of the grid.
 
     VectorField v;
     VectorField accelfluid;
@@ -85,10 +85,8 @@ protected:
     Vector3d Interpolate3DCube( const VectorField &v, const Vector3d &pos );
 
     // Vortex Velocity and Du/Dt Getters
-    virtual Vector3d velocityCylinder( const double &r, const double &phi,
-                                       const double &z ) = 0;
-    virtual Vector3d dudtCylinder( const double &r, const double &phi,
-                                   const double &z ) = 0;
+    virtual Vector3d velocityCylinder( const double &r, const double &phi, const double &z ) = 0;
+    virtual Vector3d dudtCylinder( const double &r, const double &phi, const double &z ) = 0;
 
     virtual Vector3d velocityCarthesian( const Vector3d &pos );
     virtual Vector3d dudtCarthesian( const Vector3d &pos );

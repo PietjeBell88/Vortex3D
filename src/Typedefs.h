@@ -25,6 +25,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+const double PI 3.14159265358979323846264338327950288419716939937510
 
 
 ///////////
@@ -33,9 +34,10 @@
 #include <blitz/tinyvec.h>
 #include <blitz/tinyvec-et.h>
 
-
 ////////////
 // Typedefs
 typedef blitz::TinyVector<double, 3> Vector3d;
-typedef blitz::Array<Vector3d, 3> VectorField;
 typedef blitz::Array<double, 3> ScalarField;
+typedef blitz::Array<Vector3d, 3> VectorField;
+
+
