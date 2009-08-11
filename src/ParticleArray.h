@@ -52,11 +52,12 @@ public:
     // Constructor
     ParticleArray( int initiallength );
 
-    Particle &getParticle( int p );
+    const Particle &getParticle( int p ) const;
+    void setParticle( int p, Particle particle );
 
-    const int getLength();
+    int getLength() const;
 
-    const int getMaxLength();
+    int getMaxLength() const;
 
     void add( const Vector3d &pos, const Vector3d &vel, double relative_time );
 

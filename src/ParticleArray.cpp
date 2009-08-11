@@ -45,17 +45,22 @@ ParticleArray::ParticleArray( int initiallength )
 
 ////////////////////////////////////////
 // Getters (and Setters by ref)
-Particle &ParticleArray::getParticle( int p )
+const Particle &ParticleArray::getParticle( int p ) const
 {
     return particles( p );
 }
 
-const int ParticleArray::getLength()
+void ParticleArray::setParticle( int p, Particle particle ) 
+{
+    this->particles( p ) = particle;
+}
+
+int ParticleArray::getLength() const
 {
     return length;
 }
 
-const int ParticleArray::getMaxLength()
+int ParticleArray::getMaxLength() const
 {
     return particles.size();
 }

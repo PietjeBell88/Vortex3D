@@ -49,28 +49,44 @@ Particle::Particle( int num, const Vector3d &pos, const Vector3d &vel, double sp
 
 ////////////////////////////////////////
 // Getters and Setters
-Vector3d &Particle::getPos()
+const Vector3d &Particle::getPos() const
 {
     return pos;
 }
-Vector3d &Particle::getVel()
+
+const Vector3d &Particle::getVel() const
 {
     return vel;
 }
-int &Particle::getNum()
+
+int Particle::getNum() const
 {
     return num;
 }
 
+void Particle::setPos( const Vector3d &pos )
+{
+    this->pos = pos;
+}
+
+void Particle::setVel( const Vector3d &vel )
+{
+    this->vel = vel;
+}
+
+void Particle::setNum( int num )
+{
+    this->num = num;
+}
 
 ////////////////////////////////////////
 // Other stuff
-const double Particle::spawnTime()
+double Particle::spawnTime() const
 {
     return spawntime;
 }
 
-const double Particle::speed()
+double Particle::speed() const
 {
     return sqrt( dot( vel, vel ) );
 }

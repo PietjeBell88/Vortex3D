@@ -64,6 +64,7 @@ void readRoi( const string &roi, double radius, Settings *options )
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
 
+    // Read the values into the variables.
     sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2,
             &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
 
@@ -72,9 +73,11 @@ void readRoi( const string &roi, double radius, Settings *options )
                          z1 * radius, z2 * radius;
     options->grid = X, Y, Z;
 
-    TinyVector<int, 3> & grid = options->grid; // readability
-    TinyMatrix<double, 3, 2> & delimiter = options->delimiter; //readability
+    // Readability:
+    TinyVector<int, 3> & grid = options->grid; 
+    TinyMatrix<double, 3, 2> & delimiter = options->delimiter;
 
+    // Set dx/dy/dz, and do some checks on them.
     options->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
     options->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
     options->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
@@ -91,19 +94,22 @@ void readRoi( const string &roi, double radius, Settings *options )
 
 // I don't know where this function belongs.. a lot of code comes straight from Vortex.cpp, it even uses its ROI
 // TODO: make it "const ParticleArray"
-void getConcentration( ParticleArray *particles, const Settings &options,
+void getConcentration( const ParticleArray &particles, const Settings &options,
                        ScalarField *concentration )
 {
     *concentration = 0;
-    const TinyMatrix<double, 3, 2> &delimiter = options.delimiter; //readability
-    const double & dx = options.dx; //readability
-    const double & dy = options.dy; //readability
-    const double & dz = options.dz; //readability
-    const int & length = particles->getLength();
 
+    // Readability. Hopefully optimized away.
+    const TinyMatrix<double, 3, 2> &delimiter = options.delimiter;
+    const double & dx = options.dx; 
+    const double & dy = options.dy; 
+    const double & dz = options.dz; 
+    const int & length = particles.getLength();
+
+    // Loop over every particle and increase the count by one for the box it's in.
     for ( int p = 0; p < length; p++ )
     {
-        const Vector3d & pos = particles->getParticle(p).getPos();
+        const Vector3d & pos = particles.getParticle(p).getPos();
 
         int i = static_cast<int> (floor((pos(0) - delimiter(0, 0)) / dx));
         int j = static_cast<int> (floor((pos(1) - delimiter(1, 0)) / dy));
@@ -119,43 +125,47 @@ void getConcentration( ParticleArray *particles, const Settings &options,
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                     ParticleArray *particles, const Settings &options )
 {
-    // What variables are used in this function, and make some nice reference variables for them to improve readability.
+    // Readability reference variables (Hopefully these will be optimized away).
     const double & gravity = options.gravity;
     const double & dt = options.dt;
     const double & beta = options.beta;
     const double & tau_a = options.tau_a;
 
-    /*
-     * This function calculates the new particle velocity and position based
-     * on each particles current position and velocity and the vortex's velocity vector field.
-     * It return the amount of remaining particles, so that the main loop knows when to stop,
-     * that is, when amount of particles in the box equals 0.
-     */
-
-    /*
-     * Move the particles, this can be multithreaded, if it will, Vector3d u and dv have to go inside the loop.
-     * Only the case where the particles are being reset can be included in this (possibly multithreaded) loop.
+    /* 
      * Include Drag, Gravity, Stresses and Added Mass in the equation of motion.
-     * See Formula 11 in M.F. Cargnelutti and Portela's "Influence of the resuspension on the particle sedimentation in wall-bounded turbulent flows")
-     */
+     * See Formula 11 in M.F. Cargnelutti and Portela's "Influence of the resuspension on 
+     * the particle sedimentation in wall-bounded turbulent flows")
+     */ 
+    
 #pragma omp parallel for
     for ( int p = 0; p < particles->getLength(); p++ )
     {
-        Vector3d & p_pos = particles->getParticle( p ).getPos(); // Reference variable for readability
-        Vector3d & p_vel = particles->getParticle( p ).getVel(); // Reference variable for readability
+        // Get the particle.
+        Particle particle = particles->getParticle( p );
 
-        Vector3d u, dv, v_vel, Du_Dt;
+        // Readability for rhs (hopefully optimized away).
+        const Vector3d & p_pos = particle.getPos();
+        const Vector3d & p_vel = particle.getVel();
 
-        v_vel = the_vortex->getVelocityAt( p_pos ); // Calculate the fluid velocity at the position of the particle by either interpolation or evaluation
-        Du_Dt = the_vortex->getDuDtAt( p_pos );
+        // Calculate the fluid velocity and accelertion at the position of the particle.
+        const Vector3d & v_vel = the_vortex->getVelocityAt( p_pos ); 
+        const Vector3d & Du_Dt = the_vortex->getDuDtAt( p_pos );
 
-        dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5)
-                * Vector3d( 0, 0, gravity ) + 1.5 / (beta + 0.5) * Du_Dt) * dt; // equation of motion * dt
+        // Particle equation of motion.
+        const Vector3d dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5)
+                            * Vector3d( 0, 0, gravity ) + 1.5 / (beta + 0.5) * Du_Dt) * dt;
 
-        p_vel = p_vel + dv; // Calculate the new velocity of this particle
-        p_pos = p_pos + p_vel * dt; // Calculate the new position of this particle by adding the new velocity multiplied with dt
+        // Give the particle his new velocity and position.
+        particle.setVel( p_vel + dv ); 
+        particle.setPos( p_pos + p_vel * dt ); 
+
+        // Write the particle back to the array (maybe, and hopefully, it will be written 
+        // directly to the array instead of making a temporary object like "particle" is.
+        particles->setParticle( p, particle );
+        particles->setParticle( p, particle );
     }
 }
+
 
 // checkParticles():
 // In:     - (1) The Vortex: To know how big the box is.
@@ -170,11 +180,11 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
 {
 #pragma omp critical
     {
-        // For each particle, check if it is outside or at the edge of the box; the
-        // edge counts as problematic too because then the interpolation fails.
+        // For each particle, check if it is outside or at the edge of the box; 
+        // the edge counts as problematic too because then the interpolation fails.
         int p = 0;
 
-        // loop until there are no more particles left
+        // Loop until there are no more particles left
         while ( p < particles->getLength() )
         {
             const Vector3d & p_pos = particles->getParticle( p ).getPos(); // Reference variable for readability
@@ -182,10 +192,11 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
             // Check if the particle is at the edge, or outside of the box
             if ( the_vortex->outsideBox( p_pos ) )
             {
-                double life_time = the_emitter->reset( p, relative_time,
-                        particles );
+                double life_time = the_emitter->reset( p, relative_time, particles );
+                
                 (*average_fall_time) = ((*particles_out) * (*average_fall_time)
                         + life_time) / ((*particles_out) + 1);
+
                 ++(*particles_out);
             }
             // The last particle which was moved to p might also be out-of-range and thus
@@ -206,7 +217,7 @@ inline void writeProgress( int perc )
 
 // TODO: make it "const ParticleArray"
 inline void writeToFile( double time, const Settings &options, FILE * f,
-                         ParticleArray *particles, Vortex *the_vortex )
+                         const ParticleArray &particles, Vortex *the_vortex )
 {
     static bool first_call = true;
 
@@ -218,12 +229,12 @@ inline void writeToFile( double time, const Settings &options, FILE * f,
             fprintf( f, "#T     N     X     Y     Z     Speed\n" );
             first_call = false;
         }
-        for ( int i = 0; i < particles->getLength(); i++ )
+        for ( int i = 0; i < particles.getLength(); i++ )
         {
             // Readability
-            const int & num = particles->getParticle( i ).getNum();
-            const Vector3d & pos = particles->getParticle( i ).getPos();
-            const double & speed = particles->getParticle( i ).speed();
+            const int & num = particles.getParticle( i ).getNum();
+            const Vector3d & pos = particles.getParticle( i ).getPos();
+            const double & speed = particles.getParticle( i ).speed();
 
             // Write output to file
             fprintf( f, "%e     %d     %e     %e     %e     %e\n",
@@ -239,12 +250,12 @@ inline void writeToFile( double time, const Settings &options, FILE * f,
             fprintf( f, "#T     N     X     Y     Z     Speed\n" );
             first_call = false;
         }
-        for ( int i = 0; i < particles->getLength(); i++ )
+        for ( int i = 0; i < particles.getLength(); i++ )
         {
             // Readability
-            const int & num = particles->getParticle( i ).getNum();
-            const Vector3d & pos = particles->getParticle( i ).getPos();
-            const double & speed = particles->getParticle( i ).speed();
+            const int & num = particles.getParticle( i ).getNum();
+            const Vector3d & pos = particles.getParticle( i ).getPos();
+            const double & speed = particles.getParticle( i ).speed();
 
             // Write output to file
             fprintf( f, "%e     %d     %e     %e     %e     %e\n",
@@ -262,7 +273,7 @@ inline void writeToFile( double time, const Settings &options, FILE * f,
             first_call = false;
         }
         ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
-        getConcentration(particles, options, &concentration);
+        getConcentration( particles, options, &concentration );
 
         for ( int i = 0; i < options.grid(0); i++ )
         {
@@ -601,7 +612,7 @@ int main( int argc, char* argv[] )
     int t = 0;
 
     FILE * f = fopen( datafile.c_str(), "a" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
-    writeToFile( 0, options, f, &particles, the_vortex );
+    writeToFile( 0, options, f, particles, the_vortex );
 
     // If outputtype = 3, we're done so we can output and stop.
     if ( outputtype == 3 )
@@ -619,14 +630,14 @@ int main( int argc, char* argv[] )
         writeProgress( (t * 100) / max_t ); // Display progress on stdout, e.g. [45%]
 
         // Move the particles
-        moveParticles( the_vortex, the_emitter, &particles, options ); // Move the particles, and keep track of how many particles remain inside the box.
+        moveParticles( the_vortex, the_emitter, &particles, options );
         checkParticles( the_vortex, the_emitter, &particles, relative_time,
                 &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
 
         // Write to file
         if ( relative_time > interval )
         {
-            writeToFile( time, options, f, &particles, the_vortex );
+            writeToFile( time, options, f, particles, the_vortex );
             interval += outputinterval;
         }
 

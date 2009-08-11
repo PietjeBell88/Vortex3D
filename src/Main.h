@@ -71,7 +71,7 @@ struct Settings
 // Functions
 void readRoi( const string &roi, double radius, Settings *options );
 
-void getConcentration( ParticleArray *particles, const Settings &options,
+void getConcentration( const ParticleArray &particles, const Settings &options,
                        ScalarField *concentration );
 
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
@@ -83,4 +83,4 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
 inline void writeProgress( int perc );
 
 inline void writeToFile( double time, const Settings &options, FILE * f,
-                         ParticleArray *particles, Vortex *the_vortex );
+                         const ParticleArray &particles, Vortex *the_vortex );

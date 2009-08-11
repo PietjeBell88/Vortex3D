@@ -126,7 +126,7 @@ VectorField Vortex::getVectorField()
 
 ///////////////////////////////////////////////////////////////////
 // Transformation matrix from [v_r, v_phi, v_z] to [v_x, v_y, v_z]
-TinyMatrix<double, 3, 3> Vortex::Cil2Cart( double phi )
+TinyMatrix<double, 3, 3> Vortex::cil2Cart( double phi )
 {
     TinyMatrix<double, 3, 3> M;
 
@@ -140,7 +140,7 @@ TinyMatrix<double, 3, 3> Vortex::Cil2Cart( double phi )
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Rotation matrix for rotation around the x axis ("folding the y-axis to the z-axis")
-TinyMatrix<double, 3, 3> Vortex::Rotate_x( double angle )
+TinyMatrix<double, 3, 3> Vortex::rotate_x( double angle )
 {
     TinyMatrix<double, 3, 3> M;
 
@@ -203,7 +203,7 @@ Vector3d Vortex::velocityCarthesian( const Vector3d &pos )
     double r = sqrt( x * x + y * y );
     double phi = atan2( y, x );
 
-    return product( Cil2Cart( phi ), velocityCylinder( r, phi, z ) );
+    return product( cil2Cart( phi ), velocityCylinder( r, phi, z ) );
 }
 
 Vector3d Vortex::dudtCarthesian( const Vector3d &pos )
@@ -215,17 +215,17 @@ Vector3d Vortex::dudtCarthesian( const Vector3d &pos )
     double r = sqrt( x * x + y * y );
     double phi = atan2( y, x );
 
-    return product( Cil2Cart( phi ), dudtCylinder( r, phi, z ) );
+    return product( cil2Cart( phi ), dudtCylinder( r, phi, z ) );
 }
 
 Vector3d Vortex::velocityAngle( const Vector3d &pos )
 {
-    return product( Rotate_x( angle ), velocityCarthesian( product( Rotate_x( -angle ), pos ) ) );
+    return product( rotate_x( angle ), velocityCarthesian( product( rotate_x( -angle ), pos ) ) );
 }
 
 Vector3d Vortex::dudtAngle( const Vector3d &pos )
 {
-    return product( Rotate_x( angle ), dudtCarthesian( product( Rotate_x( -angle ), pos ) ) );
+    return product( rotate_x( angle ), dudtCarthesian( product( rotate_x( -angle ), pos ) ) );
 }
 
 

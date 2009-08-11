@@ -11,7 +11,21 @@
 			Name="Release|Win32">
 			<Tool
 				Name="CppCmplrTool"
+				GlobalOptimizations="true"
+				UseProcessorExtensions="6"
 				Parallelization="true"
+				C99Support="true"
+				ProfileGuidedOptimization="0"/>
+		</Configuration>
+		<Configuration
+			Name="ReleaseIntel|Win32">
+			<Tool
+				Name="CppCmplrTool"
+				Optimization="1000"
+				GlobalOptimizations="true"
+				EnableEnhancedInstructionSet="1000"
+				GenerateAlternateCodePaths="0"
+				UseProcessorExtensions="6"
 				C99Support="true"/>
 		</Configuration>
 	</Configurations>

@@ -49,14 +49,19 @@ public:
     Particle( int num, const Vector3d &pos, const Vector3d &vel, double spawntime );
 
     // Getters and Setters
-    Vector3d &getPos();
+    const Vector3d &getPos() const;
+    void setPos( const Vector3d &pos );
 
-    Vector3d &getVel();
+    const Vector3d &getVel() const;
+    void setVel( const Vector3d &vel );
 
-    int &getNum();
+    int getNum() const;
+    void setNum( int num );
+
+
 
     // Other stuff
-    const double spawnTime();
+    double spawnTime() const;
 
-    const double speed();
+    double speed() const;
 };
