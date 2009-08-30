@@ -39,5 +39,3 @@
 typedef blitz::TinyVector<double, 3> Vector3d;
 typedef blitz::Array<double, 3> ScalarField;
 typedef blitz::Array<Vector3d, 3> VectorField;
-
-

@@ -44,7 +44,7 @@ ParticleArray::ParticleArray( int initiallength )
 
 
 ////////////////////////////////////////
-// Getters (and Setters by ref)
+// Getters and Setters
 const Particle &ParticleArray::getParticle( int p ) const
 {
     return particles( p );

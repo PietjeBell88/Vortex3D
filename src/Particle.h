@@ -37,6 +37,8 @@
 class Particle
 {
 private:
+    // TODO: Only keep track of startpos when using random emitters?
+    Vector3d startPos;
     Vector3d pos;
     Vector3d vel;
     int num;

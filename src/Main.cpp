@@ -162,7 +162,6 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
         // Write the particle back to the array (maybe, and hopefully, it will be written 
         // directly to the array instead of making a temporary object like "particle" is.
         particles->setParticle( p, particle );
-        particles->setParticle( p, particle );
     }
 }
 

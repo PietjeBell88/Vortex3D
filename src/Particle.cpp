@@ -42,6 +42,7 @@ Particle::Particle( int num, const Vector3d &pos, const Vector3d &vel, double sp
 {
     this->num = num;
     this->pos = pos;
+    this->startPos = pos;
     this->vel = vel;
     this->spawntime = spawntime;
 }
