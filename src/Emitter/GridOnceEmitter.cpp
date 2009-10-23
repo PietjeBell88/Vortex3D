@@ -24,40 +24,62 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
 
 ///////////
 // Headers
-#include <blitz/array.h>
-#include "Typedefs.h"
+#include "GridOnceEmitter.h"
+
+#include "..\ParticleArray.h"
+#include "..\Particle.h"
 
 
-////////////////////////
-// Forward Declarations
-class Particle;
+////////////////////////////////////////
+// Constructor
+GridOnceEmitter::GridOnceEmitter( double p_density, double p_diameter, 
+                                  double p_velocity, const string &dimensions, 
+                                  double radius, double p_rate, int reset_particles ) :
+    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
+{}
 
 
-/////////////////
-// ParticleArray
-class ParticleArray
+//////////////
+// Destructor
+GridOnceEmitter::~GridOnceEmitter() {}
+
+
+////////////////////////////////////////
+// Particle Property Generators (private)
+Vector3d GridOnceEmitter::startPos( int p )
 {
-private:
-    int length; // Keeps track of how many particles there are.
-    int nextIndex; // Contains the index of the next particle when added.
-    blitz::Array<Particle, 1> particles; // The array for the particles.
+    // What variables are used in this function?
 
-public:
-    // Constructor
-    ParticleArray( int initiallength );
+    /*
+     * This function directly calculates the starting position from the
+     * particle number; this comes in handy when resetting particles, if
+     * they leave the cube, to the position they started;
+     */
+    int i = p / (( p_grid(1) ) * ( p_grid(2) ));
+    int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
+    int k = p % ( p_grid(2) );
 
-    const Particle &getParticle( int p ) const;
-    void setParticle( int p, Particle particle );
+    return Vector3d( delimiter(0, 0) + i * dx,
+                     delimiter(1, 0) + j * dy,
+                     delimiter(2, 0) + k * dz );
+}
 
-    int getLength() const;
+Vector3d GridOnceEmitter::startVel( int p )
+{
+    return Vector3d( 0, 0, p_velocity );
+}
 
-    int getMaxLength() const;
 
-    void add( const Vector3d &pos, const Vector3d &vel, double relative_time );
+////////////////////////////////////////
+// Init, Update (public), Reset is default
+void GridOnceEmitter::init( ParticleArray *particles )
+{
+    for ( int p = 0; p < p_N; p++ )
+        particles->add( startPos( p ), startVel( p ), 0 );
+}
 
-    Particle remove( int p );
-};
+void GridOnceEmitter::update( double relative_time, ParticleArray *particles )
+{}

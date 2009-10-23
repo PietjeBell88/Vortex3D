@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Emitter">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{4d919015-12dd-430c-8cae-478d513d1731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{b6f4c0df-475d-4ac1-aaa7-7db2f41675ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Output">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{eaa79f8f-e552-4c59-9998-55c383cb5e86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vortex">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\getopt_pp.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Emitter\Emitter.cpp">
+      <Filter>Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Emitter\GridEmitter.cpp">
+      <Filter>Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Emitter\GridOnceEmitter.cpp">
+      <Filter>Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Emitter\RandomEmitter.cpp">
+      <Filter>Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Output\Output.cpp">
+      <Filter>Output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Output\PythonOutput.cpp">
+      <Filter>Output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Output\TecplotOutput.cpp">
+      <Filter>Output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Particle.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ParticleArray.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Vortex\BurgersVortex.cpp">
+      <Filter>Vortex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Vortex\Vortex.cpp">
+      <Filter>Vortex</Filter>
+    </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\external\getopt_pp.h">
+      <Filter>External</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\external\MTRand.h">
+      <Filter>External</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Emitter\Emitter.h">
+      <Filter>Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Emitter\GridEmitter.h">
+      <Filter>Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Emitter\GridOnceEmitter.h">
+      <Filter>Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Emitter\RandomEmitter.h">
+      <Filter>Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Main.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Output\Output.h">
+      <Filter>Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Output\PythonOutput.h">
+      <Filter>Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Output\TecplotOutput.h">
+      <Filter>Output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Particle.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\ParticleArray.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Typedefs.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Vortex\BurgersVortex.h">
+      <Filter>Vortex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Vortex\Vortex.h">
+      <Filter>Vortex</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

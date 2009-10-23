@@ -26,38 +26,21 @@
 
 #pragma once
 
+
 ///////////
 // Headers
-#include <blitz/array.h>
-#include "Typedefs.h"
+#include "Output.h"
 
 
-////////////////////////
-// Forward Declarations
-class Particle;
-
-
-/////////////////
-// ParticleArray
-class ParticleArray
+class TecplotOutput : public Output
 {
-private:
-    int length; // Keeps track of how many particles there are.
-    int nextIndex; // Contains the index of the next particle when added.
-    blitz::Array<Particle, 1> particles; // The array for the particles.
-
+protected:
+    virtual void writeConcentration( bool first_call, double time, const ParticleArray &particles );
+    virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles );
+    virtual void writeVelocityField( bool first_call, double time );
 public:
-    // Constructor
-    ParticleArray( int initiallength );
+    TecplotOutput( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
+                   int outputtype, Vortex *the_vortex );
 
-    const Particle &getParticle( int p ) const;
-    void setParticle( int p, Particle particle );
-
-    int getLength() const;
-
-    int getMaxLength() const;
-
-    void add( const Vector3d &pos, const Vector3d &vel, double relative_time );
-
-    Particle remove( int p );
+    virtual ~TecplotOutput();
 };

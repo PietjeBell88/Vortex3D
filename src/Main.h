@@ -35,8 +35,6 @@
 
 #include "Typedefs.h"
 
-using blitz::TinyVector;
-using blitz::TinyMatrix;
 using std::string;
 
 
@@ -52,7 +50,7 @@ class ParticleArray;
 struct Settings
 {
     double systemtime;
-    double gravity;
+    Vector3d gravity;
     double dt;
     int reset_particles;
     double beta; // This ratio is used in the equation of motion
@@ -60,12 +58,19 @@ struct Settings
     string datafile;
     int outputtype;
     // Used for concentration
-    TinyVector<int, 3> grid; // X x Y x Z grid of resolution
-    TinyMatrix<double, 3, 2> delimiter; //offsets
+    TGrid grid; // X x Y x Z grid of resolution
+    TDelimiter delimiter; //offsets
     bool tecplot;
     double dx, dy, dz;
 };
 
+struct Vortex3dParam {
+    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat;
+    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
+           duration, p_velocity, outputinterval, dtscale, p_rate;
+    bool interpolate, rotategrav;
+    string parameters, roi, dimensions, datafile;
+};
 
 /////////////
 // Functions
@@ -82,5 +87,3 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
 
 inline void writeProgress( int perc );
 
-inline void writeToFile( double time, const Settings &options, FILE * f,
-                         const ParticleArray &particles, Vortex *the_vortex );

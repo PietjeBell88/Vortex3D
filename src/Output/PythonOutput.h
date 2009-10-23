@@ -27,29 +27,23 @@
 #pragma once
 
 
-//////////
-//Headers
-#include "Emitter.h"
-#include "Typedefs.h"
+///////////
+// Headers
+#include "Output.h"
 
 
-///////////////////
-// GridOnceEmitter
-class GridOnceEmitter: public Emitter
+class PythonOutput : public Output
 {
 protected:
-    Vector3d startPos( int p );
+    virtual void printFileHeader();
+    virtual void printFileFooter();
 
-    Vector3d startVel( int p );
-
+    virtual void writeConcentration( bool first_call, double time, const ParticleArray &particles );
+    virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles );
+    virtual void writeVelocityField( bool first_call, double time );
 public:
-    GridOnceEmitter( double p_density, double p_diameter, double p_velocity, 
-                 const string &dimensions, double radius, double p_rate,
-                 int reset_particles );
+    PythonOutput( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
+                  int outputtype, Vortex *the_vortex );
 
-    virtual ~GridOnceEmitter();
-
-    virtual void init( ParticleArray *particles );
-
-    virtual void update( double relative_time, ParticleArray *particles );
+    virtual ~PythonOutput();
 };

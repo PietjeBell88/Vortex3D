@@ -30,7 +30,7 @@
 //////////
 //Headers
 #include "Emitter.h"
-#include "Typedefs.h"
+#include "..\Typedefs.h"
 
 
 /////////////////

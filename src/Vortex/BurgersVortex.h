@@ -26,32 +26,32 @@
 
 #pragma once
 
+///////////
+// Headers
+#include "Vortex.h"
+#include "..\Typedefs.h"
 
-//////////
-//Headers
-#include "Emitter.h"
-#include "Typedefs.h"
 
+/////////////////
+// BurgersVortex
 
-///////////////
-// GridEmitter
-class GridEmitter: public Emitter
+class BurgersVortex: public Vortex
 {
 protected:
-    double last_emit_time; // Relative time at which the last particles were emitted
+    // BurgersVortex Specific Properties
+    double kappa; // Determines Strength.
+    double alpha; // Determines Stretching.
+    double stretching_r; // Custom stretching in r-direction.
+    double stretching_z; // Custom strechting in z-direction.
+
+    // The usual functions.
+    virtual inline Vector3d velocityCylinder( double r, double phi, double z );
+    virtual inline Vector3d dudtCylinder( double r, double phi, double z );
 
 public:
-    GridEmitter( double p_density, double p_diameter, double p_velocity, 
-                 const string &dimensions, double radius, double p_rate,
-                 int reset_particles );
+    BurgersVortex( const string &parameters, double radius, double velocity, 
+                   double angle, double fl_mu, double fl_density, 
+                   bool interpolate, const string &roi, bool rotategrav );
 
-    virtual ~GridEmitter();
-
-    virtual void init( ParticleArray *particles );
-
-    virtual void update( double relative_time, ParticleArray *particles );
-
-    virtual Vector3d startPos( int p );
-
-    virtual Vector3d startVel( int p );
+    virtual ~BurgersVortex();
 };

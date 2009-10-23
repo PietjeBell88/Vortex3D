@@ -24,71 +24,49 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#pragma once 
+
 
 ///////////
 // Headers
-#include <string.h>
-
-#include <blitz/tinymat.h>
-#include <blitz/tinyvec.h>
-#include <blitz/tinyvec-et.h>
-
-#include "Typedefs.h"
+#include <fstream>
+#include "..\Typedefs.h"
+#include "..\Main.h" 
 
 
 ////////////////////////
 // Forward Declarations
+class Vortex;
 class ParticleArray;
-class Particle;
 
 
-/////////////
-// Namespace
-using blitz::TinyVector;
-using blitz::TinyMatrix;
-using std::string;
-
-
-///////////
-// Emmiter
-class Emitter
+//////////
+// Output
+class Output
 {
 protected:
-    // Local variables.
-    TinyVector<int, 3> p_grid; // X x Y x Z grid of particles
-    TinyMatrix<double, 3, 2> delimiter; // The edges of the box.
-    double dx, dy, dz; // The stepsizes.
+    FILE * f;                           // Output file.
+    TGrid grid;            // X x Y x Z grid of resolution
+    TDelimiter delimiter; // Offsets
+    Vortex *the_vortex;
+    double dx, dy, dz;
+    int outputtype;
+    Vortex3dParam param;
 
-    // For the ones below, please see --help.
-    double p_density;
-    double p_diameter;
-    double p_velocity;
+    void getConcentration( const ParticleArray &particles, ScalarField *concentration );
 
-    double p_rate;
-    int reset_particles;
-    int p_N;
+    virtual void printFileHeader();
+    virtual void printFileFooter();
 
-    // Functions only used local in init(), update() and reset().
-    virtual Vector3d startPos( int p ) = 0;
-
-    virtual Vector3d startVel( int p ) = 0;
+    virtual void writeConcentration( bool first_call, double time, const ParticleArray &particles ) = 0;
+    virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles ) = 0;
+    virtual void writeVelocityField( bool first_call, double time ) = 0;
 
 public:
-    Emitter( double p_density, double p_diameter, double p_velocity, 
-             const string &dimensions, double radius, double p_rate,
-             int reset_particles );
+    Output( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
+            int outputtype, Vortex *the_vortex );
 
-    virtual ~Emitter();
+    virtual ~Output();
 
-    virtual void init( ParticleArray *particles ) = 0;
-
-    virtual void update( double relative_time, ParticleArray *particles ) = 0;
-
-    // reset():
-    // In:     - (1) The number of the particle to be reset.
-    //         - (2) The current relative time (as fraction of going around time T_l).
-    // In/Out: - (3) The particlearray of which the particle is to be removed.
-    // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
-    virtual double reset( int p, double relative_time, ParticleArray *particles );
+    void writeToFile( double time, const ParticleArray &particles );
 };

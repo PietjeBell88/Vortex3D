@@ -25,6 +25,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // TODOLIST
+// TODO: move the equation of motion etc to a seperate class
+// TODO: move parameter parsing checking to seperate function
+// TODO: merge options and param
+// TODO: edit constructors to receive Vortex3dParam, (but keep the class variables, it's so much easier to read and makes it easy to understand what plays a role in that class)
 // TODO: error checks on parameters
 // TODO: Outputting data in HDF5 or whatever
 // TODO: different ways of specifying what the vortex should look like
@@ -36,23 +40,26 @@
 #include "Main.h"
 
 #include <stdio.h>
-#include <fstream>
 
 #include "..\external\getopt_pp.h"
 
-#include "BurgersVortex.h"
-#include "Emitter.h"
-#include "GridEmitter.h"
-#include "GridOnceEmitter.h"
-#include "RandomEmitter.h"
+#include "Vortex\BurgersVortex.h"
+
+#include "Output\Output.h"
+#include "Output\PythonOutput.h"
+#include "Output\TecplotOutput.h"
+
+#include "Emitter\Emitter.h"
+#include "Emitter\GridEmitter.h"
+#include "Emitter\GridOnceEmitter.h"
+#include "Emitter\RandomEmitter.h"
+
 #include "ParticleArray.h"
 #include "Particle.h"
 
 
 /////////////
 // Namespace
-using blitz::TinyVector;
-using blitz::TinyMatrix;
 using std::string;
 using std::cout;
 
@@ -74,8 +81,8 @@ void readRoi( const string &roi, double radius, Settings *options )
     options->grid = X, Y, Z;
 
     // Readability:
-    TinyVector<int, 3> & grid = options->grid; 
-    TinyMatrix<double, 3, 2> & delimiter = options->delimiter;
+    TGrid & grid = options->grid; 
+    TDelimiter & delimiter = options->delimiter;
 
     // Set dx/dy/dz, and do some checks on them.
     options->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
@@ -92,41 +99,11 @@ void readRoi( const string &roi, double radius, Settings *options )
         options->dz = 0;
 }
 
-// I don't know where this function belongs.. a lot of code comes straight from Vortex.cpp, it even uses its ROI
-// TODO: make it "const ParticleArray"
-void getConcentration( const ParticleArray &particles, const Settings &options,
-                       ScalarField *concentration )
-{
-    *concentration = 0;
-
-    // Readability. Hopefully optimized away.
-    const TinyMatrix<double, 3, 2> &delimiter = options.delimiter;
-    const double & dx = options.dx; 
-    const double & dy = options.dy; 
-    const double & dz = options.dz; 
-    const int & length = particles.getLength();
-
-    // Loop over every particle and increase the count by one for the box it's in.
-    for ( int p = 0; p < length; p++ )
-    {
-        const Vector3d & pos = particles.getParticle(p).getPos();
-
-        int i = static_cast<int> (floor((pos(0) - delimiter(0, 0)) / dx));
-        int j = static_cast<int> (floor((pos(1) - delimiter(1, 0)) / dy));
-        int k = static_cast<int> (floor((pos(2) - delimiter(2, 0)) / dz));
-
-        ++(*concentration)(i, j, k);
-    }
-
-    if ( sum( *concentration ) != 0 )
-        *concentration = (*concentration) / sum( *concentration );
-}
-
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                     ParticleArray *particles, const Settings &options )
 {
     // Readability reference variables (Hopefully these will be optimized away).
-    const double & gravity = options.gravity;
+    const Vector3d & gravity = options.gravity;
     const double & dt = options.dt;
     const double & beta = options.beta;
     const double & tau_a = options.tau_a;
@@ -153,7 +130,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
 
         // Particle equation of motion.
         const Vector3d dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5)
-                            * Vector3d( 0, 0, gravity ) + 1.5 / (beta + 0.5) * Du_Dt) * dt;
+                            * gravity + 1.5 / (beta + 0.5) * Du_Dt) * dt;
 
         // Give the particle his new velocity and position.
         particle.setVel( p_vel + dv ); 
@@ -214,205 +191,6 @@ inline void writeProgress( int perc )
     fflush( stdout);
 }
 
-// TODO: make it "const ParticleArray"
-inline void writeToFile( double time, const Settings &options, FILE * f,
-                         const ParticleArray &particles, Vortex *the_vortex )
-{
-    static bool first_call = true;
-
-    // Print the particle positions
-    if ( options.outputtype == 1 && !options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f, "#T     N     X     Y     Z     Speed\n" );
-            first_call = false;
-        }
-        for ( int i = 0; i < particles.getLength(); i++ )
-        {
-            // Readability
-            const int & num = particles.getParticle( i ).getNum();
-            const Vector3d & pos = particles.getParticle( i ).getPos();
-            const double & speed = particles.getParticle( i ).speed();
-
-            // Write output to file
-            fprintf( f, "%e     %d     %e     %e     %e     %e\n",
-                     time, num, pos(0), pos(1), pos(2), speed);
-        }
-        fprintf( f, "\n" );
-    }
-
-    else if ( options.outputtype == 1 && options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f, "#T     N     X     Y     Z     Speed\n" );
-            first_call = false;
-        }
-        for ( int i = 0; i < particles.getLength(); i++ )
-        {
-            // Readability
-            const int & num = particles.getParticle( i ).getNum();
-            const Vector3d & pos = particles.getParticle( i ).getPos();
-            const double & speed = particles.getParticle( i ).speed();
-
-            // Write output to file
-            fprintf( f, "%e     %d     %e     %e     %e     %e\n",
-                     time, num, pos(0), pos(1), pos(2), speed);
-        }
-        fprintf( f, "\n" );
-    }
-
-    // Print the concentration
-    else if ( options.outputtype == 2 && !options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f, "#T     X     Y     Z     C\n" );
-            first_call = false;
-        }
-        ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
-        getConcentration( particles, options, &concentration );
-
-        for ( int i = 0; i < options.grid(0); i++ )
-        {
-            double x = options.delimiter(0, 0) + i * options.dx;
-            for ( int j = 0; j < options.grid(1); j++ )
-            {
-                double y = options.delimiter(1, 0) + j * options.dy;
-                for ( int k = 0; k < options.grid(2); k++ )
-                {
-                    double z = options.delimiter(2, 0) + k * options.dz;
-                    fprintf( f, "%e     %e     %e     %e     %e\n",
-                             time, x, y, z, concentration(i, j, k));
-                }
-            }
-        }
-        fprintf( f, "\n" );
-    }
-
-    else if ( options.outputtype == 2 && options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f,
-                     "TITLE=\"Example: Multi-Zone XY Line Plot Wwith Variable Sharing\"\n \
-                      VARIABLES=\"X\" \"Y\" \"Z\" \"C\"\n \
-                      ZONE T = \"%f seconds\", I = %d, J = %d, K = %d, DATAPACKING = POINT\n",
-                     time, options.grid(0), options.grid(1), options.grid(2) );
-            first_call = false;
-
-            ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
-            getConcentration( particles, options, &concentration );
-
-            for ( int i = 0; i < options.grid(0); i++ )
-            {
-                double x = options.delimiter(0, 0) + i * options.dx;
-                for ( int j = 0; j < options.grid(1); j++ )
-                {
-                    double y = options.delimiter(1, 0) + j * options.dy;
-                    for ( int k = 0; k < options.grid(2); k++ )
-                    {
-                        double z = options.delimiter(2, 0) + k * options.dz;
-                        fprintf(f, "%e     %e     %e     %e     %e\n",
-                                time, x, y, z, concentration(i, j, k));
-                    }
-                }
-            }
-            fprintf( f, "\n" );
-        }
-
-        else
-        {
-            fprintf( f,
-                     "ZONE T = \"%f seconds\", I = %d, J = %d, K = %d, DATAPACKING = POINT\n \
-                      VARSHARELIST=([1-3]=1)\n",
-                     time, options.grid(0), options.grid(1), options.grid(2) );
-
-            ScalarField concentration( options.grid(0), options.grid(1), options.grid(2) );
-            getConcentration( particles, options, &concentration );
-
-            for ( int i = 0; i < options.grid(0); i++ )
-            {
-                for ( int j = 0; j < options.grid(1); j++ )
-                {
-                    for ( int k = 0; k < options.grid(2); k++ )
-                    {
-                        fprintf( f, "%e\n", concentration(i, j, k) );
-                    }
-                }
-            }
-            fprintf( f, "\n" );
-        }
-    }
-
-    // Print the Vortex Field
-    // Mayavi2 version
-    else if ( options.outputtype == 3 && !options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f, "#T     X     Y     Z     UX     UY     UZ\n" );
-            first_call = false;
-        }
-        const VectorField &v = the_vortex->getVectorField();
-
-        for ( int i = 0; i < options.grid(0); i++ )
-        {
-            double x = options.delimiter(0, 0) + i * options.dx;
-            for ( int j = 0; j < options.grid(1); j++ )
-            {
-                double y = options.delimiter(1, 0) + j * options.dy;
-                for ( int k = 0; k < options.grid(2); k++ )
-                {
-                    double z = options.delimiter(2, 0) + k * options.dz;
-                    const Vector3d &vel = v(i, j, k);
-                    fprintf( f,
-                             "%e     %e     %e     %e     %e     %e     %e\n",
-                             time, x, y, z, vel(0), vel(1), vel(2) );
-                }
-            }
-        }
-        fprintf( f, "\n" );
-    }
-
-    // TECPLOT Version
-    else if ( options.outputtype == 3 && options.tecplot )
-    {
-        if ( first_call )
-        {
-            fprintf( f,
-                     "TITLE=\"Simple Data File\"\nVARIABLES=\"X\" \"Y\" \"Z\" \"UX\" \"UY\" \"UZ\"\nZONE I = %d, J = %d, K = %d, DATAPACKING = POINT\n",
-                     options.grid(0), options.grid(1), options.grid(2) );
-            first_call = false;
-        }
-        const VectorField &v = the_vortex->getVectorField();
-
-        for ( int i = 0; i < options.grid(0); i++ )
-        {
-            double x = options.delimiter(0, 0) + i * options.dx;
-            for ( int j = 0; j < options.grid(1); j++ )
-            {
-                double y = options.delimiter(1, 0) + j * options.dy;
-                for ( int k = 0; k < options.grid(2); k++ )
-                {
-                    double z = options.delimiter(2, 0) + k * options.dz;
-                    const Vector3d &vel = v(i, j, k);
-                    fprintf( f, "%e     %e     %e     %e     %e     %e\n",
-                             x, y, z, vel(0), vel(1), vel(2) );
-                }
-            }
-        }
-        fprintf( f, "\n" );
-    }
-
-    else
-    {
-        cout << "Invalid output method.";
-        exit(1);
-    }
-}
-
 
 void show_help()
 {
@@ -425,12 +203,16 @@ void show_help()
   --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n\
                                                  2: Relative concentration.\n\
                                                  3: Vortex VectorField.\n\
+  --outputformat <int> (=1)                      1: Python\n\
+                                                 2: Tecplot\n\
+                                                 3: Matlab\n\
   --outputinterval <double> (=0.0)               Fraction of T_l, e.g. 0.1 = emit every 0.1th T_l.\n\
   --interpolate                                  Use interpolation instead of direct evaluation.\n\
   --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
   --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
   --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n\
   --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n\
+  --rotategrav                                   Rotate not the vortex but the gravity.\n\
   --tecplot                                      Print data format for tecplot\n\
 \n\
 Vortex Properties:\
@@ -460,11 +242,7 @@ Particle/Emitter Properties:\
 
 int main( int argc, char* argv[] )
 {
-    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype;
-    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
-           duration, p_velocity, outputinterval, dtscale, p_rate;
-    bool interpolate;
-    string parameters, roi, dimensions, datafile;
+    Vortex3dParam param;
 
     using GetOpt::GetOpt_pp;
     using GetOpt::Option;
@@ -478,130 +256,139 @@ int main( int argc, char* argv[] )
         exit( 1 );
     }
 
-    ops >> Option( 'a', "vortextype", vortextype, 1 )
-        >> Option( 'a', "radius", radius, 0.1 )
-        >> Option( 'a', "velocity", velocity, 0.001 )
-        >> Option( 'a', "parameters", parameters, "" )
-        >> Option( 'a', "angle", angle, 0.0 )
-        >> Option( 'a', "roi", roi, "[-5:101:5,-5:101:5,-5:101:5]" )
-        >> Option( 'a', "emittertype", emittertype, 1 )
-        >> Option( 'a', "dimensions", dimensions, "[-4:30:4,0:1:0,4:1:4]" )
-        >> Option( 'a', "p_rate", p_rate, 100.0 )
-        >> Option( 'a', "p_density", p_density, 1000.0 )
-        >> Option( 'a', "p_diameter", p_diameter, 5E-5 )
-        >> Option( 'a', "fl_mu", fl_mu, 18E-6 )
-        >> Option( 'a', "fl_density", fl_density, 1.0 )
-        >> Option( 'a', "p_velocity", p_velocity, 0.0 )
-        >> Option( 'a', "reset_particles", reset_particles, 0 )
-        >> Option( 'a', "datafile", datafile, "test.txt" )
-        >> Option( 'a', "outputtype", outputtype, 1 )
-        >> Option( 'a', "outputinterval", outputinterval, 0.0 )
-        >> OptionPresent( 'a', "interpolate", interpolate )
-        >> Option( 'a', "duration", duration, 1.0 )
-        >> Option( 'a', "maxparticles", maxparticles, 1000 )
-        >> Option( 'a', "gravity", grav, 1 )
-        >> Option( 'a', "dtscale", dtscale, 0.5 )
+    ops >> Option( 'a', "vortextype", param.vortextype, 1 )
+        >> Option( 'a', "radius", param.radius, 0.1 )
+        >> Option( 'a', "velocity", param.velocity, 0.001 )
+        >> Option( 'a', "parameters", param.parameters, "" )
+        >> Option( 'a', "angle", param.angle, 0.0 )
+        >> Option( 'a', "roi", param.roi, "[-5:101:5,-5:101:5,-5:101:5]" )
+        >> Option( 'a', "emittertype", param.emittertype, 1 )
+        >> Option( 'a', "dimensions", param.dimensions, "[-4:30:4,0:1:0,4:1:4]" )
+        >> Option( 'a', "p_rate", param.p_rate, 100.0 )
+        >> Option( 'a', "p_density", param.p_density, 1000.0 )
+        >> Option( 'a', "p_diameter", param.p_diameter, 5E-5 )
+        >> Option( 'a', "fl_mu", param.fl_mu, 18E-6 )
+        >> Option( 'a', "fl_density", param.fl_density, 1.0 )
+        >> Option( 'a', "p_velocity", param.p_velocity, 0.0 )
+        >> Option( 'a', "reset_particles", param.reset_particles, 0 )
+        >> Option( 'a', "datafile", param.datafile, "test.txt" )
+        >> Option( 'a', "outputtype", param.outputtype, 1 )
+        >> Option( 'a', "outputformat", param.outputformat, 1 )
+        >> Option( 'a', "outputinterval", param.outputinterval, 0.0 )
+        >> OptionPresent( 'a', "interpolate", param.interpolate )
+        >> Option( 'a', "duration", param.duration, 1.0 )
+        >> Option( 'a', "maxparticles", param.maxparticles, 1000 )
+        >> Option( 'a', "gravity", param.grav, 1 )
+        >> OptionPresent( 'a', "rotategrav", param.rotategrav )
+        >> Option( 'a', "dtscale", param.dtscale, 0.5 )
      ;
 
     //gedoe
     Settings options;
-    options.tecplot = ops >> OptionPresent( 'y', "tecplot" );
-    options.systemtime = p_density * p_diameter * p_diameter / (18 * fl_mu);
-    options.gravity = -9.81 * grav;
-    options.dt = dtscale * options.systemtime;
-    options.reset_particles = reset_particles;
-    options.beta = p_density / fl_density; // This ratio is used in the equation of motion
-    options.tau_a = (options.beta + 0.5) / options.beta * options.systemtime;
-    options.datafile = datafile;
-    options.outputtype = outputtype;
+    options.systemtime = param.p_density * param.p_diameter * param.p_diameter / (18 * param.fl_mu);
 
-    p_velocity = (1 - (1 / options.beta)) * p_velocity * options.systemtime * -9.81;
-    readRoi( roi, radius, &options ); // Write some settings to options
+    // Set the proper gravity.
+    if (!param.rotategrav)
+        options.gravity = Vector3d( 0, 0, -9.81 * param.grav );
+    else
+        options.gravity = Vector3d( 0, sin(param.angle), -cos(param.angle) );
+
+    options.dt = param.dtscale * options.systemtime;
+    options.reset_particles = param.reset_particles;
+    options.beta = param.p_density / param.fl_density; // This ratio is used in the equation of motion
+    options.tau_a = (options.beta + 0.5) / options.beta * options.systemtime;
+    options.datafile = param.datafile;
+    options.outputtype = param.outputtype;
+
+    param.p_velocity = (1 - (1 / options.beta)) * param.p_velocity * options.systemtime * -9.81;
+    readRoi( param.roi, param.radius, &options ); // Write some settings to options
 
     // Parameter Checking:
     // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
-    if ( outputtype == 3 )
-        interpolate = true;
+    if ( param.outputtype == 3 )
+        param.interpolate = true;
 
     // In case of the GridEmitters (1 and 2) maxparticles should be at least the size of one grid.
-    if ( emittertype == 1 || emittertype == 2 )
+    if ( param.emittertype == 1 || param.emittertype == 2 )
     {
         double x1, x2, y1, y2, z1, z2;
         int X, Y, Z;
 
 
-        sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+        sscanf( param.dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
                 &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
 
         int p_N = X * Y * Z;
 
-        if ( maxparticles < p_N )
-            maxparticles = p_N;
+        if ( param.maxparticles < p_N )
+            param.maxparticles = p_N;
     }
 
-    FILE * stat = fopen( datafile.c_str(), "w" );
-    fprintf(
-             stat,
-             "#Settings: vortextype %d, radius %e, velocity %e, parameters \"%s\" \
-             , angle %e, roi \"%s\", emittertype %d, dimensions \"%s\", p_rate %e \
-             , p_density %e, p_diameter %e, fl_mu %e, fl_density %e, p_velocity %e \
-             , reset_particles %d, datafile \"%s\", outputtype %d, outputinterval %e \
-             , interpolate %d, duration %e, maxparticles %d, gravity %d\n",
-             vortextype, radius, velocity, parameters.c_str(),
-             angle, roi.c_str(), emittertype, dimensions.c_str(), p_rate,
-             p_density, p_diameter, fl_mu, fl_density, p_velocity,
-             reset_particles, datafile.c_str(), outputtype, outputinterval,
-             interpolate, duration, maxparticles, grav );
 
-    fprintf( stat, "#Other: Systemtime %e, TerminalVelocity %e\n",
-             options.systemtime, (1 - (1 / options.beta)) * options.systemtime * -9.81 );
-
-    fclose( stat );
 
     // Making the Vortex
-    Vortex * the_vortex;
+    Vortex *the_vortex;
 
-    if ( vortextype == 1 )
-    {
-        the_vortex = new BurgersVortex( parameters, radius, velocity, angle,
-                fl_mu, fl_density, interpolate, roi );
-    }
-    else
-    {
-        cout << "Unknown Vortex type";
-        exit(1);
+    switch ( param.vortextype ) {
+        case 1:
+            the_vortex = new BurgersVortex( param.parameters, param.radius, param.velocity, param.angle,
+                param.fl_mu, param.fl_density, param.interpolate, param.roi, param.rotategrav );
+            break;
+        default:
+            cout << "Unknown Vortex type";
+            exit(1);
     }
 
     // See the comment at initInterpolate() as to why this is here.
-    if ( interpolate == true )
+    if ( param.interpolate == true )
         the_vortex->initInterpolate();
 
     // Making the Emitter
     //GridOnceEmitter tempEmitter(p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles);
-    Emitter * the_emitter;
+    Emitter *the_emitter;
 
-    if ( emittertype == 1 )
-        the_emitter = new GridOnceEmitter( p_density, p_diameter, p_velocity,
-                dimensions, radius, p_rate, reset_particles );
-    else if ( emittertype == 2 )
-        the_emitter = new GridEmitter( p_density, p_diameter, p_velocity,
-                dimensions, radius, p_rate, reset_particles );
-    else if ( emittertype == 3 )
-        the_emitter = new RandomEmitter( p_density, p_diameter, p_velocity,
-                dimensions, radius, p_rate, reset_particles );
-    else
-    {
-        cout << "Unknown Emitter type";
-        exit( 1 );
+    
+    switch ( param.emittertype ) {
+        case 1:
+            the_emitter = new GridOnceEmitter( param.p_density, param.p_diameter, param.p_velocity,
+                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            break;
+        case 2:
+            the_emitter = new GridEmitter( param.p_density, param.p_diameter, param.p_velocity,
+                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            break;
+        case 3:
+            the_emitter = new RandomEmitter( param.p_density, param.p_diameter, param.p_velocity,
+                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            break;
+        default:
+            cout << "Unknown Emitter type";
+            exit( 1 );
+    } 
+
+
+    // Making the Output
+    Output * outputter;
+    FILE * f = fopen( param.datafile.c_str(), "a" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
+
+    switch ( param.outputformat ) {
+        case 1:
+            outputter = new PythonOutput( f, options.grid, options.delimiter, param.outputtype, the_vortex );
+            break;
+        case 2:
+            outputter = new TecplotOutput( f, options.grid, options.delimiter, param.outputtype, the_vortex );
+            break;
+        default:
+            cout << "Unknown outputformat.";
     }
 
     // Allocating memory for the array that holds the particles, and initializing (possibly emitting the first particles);
-    ParticleArray particles( maxparticles );
+    ParticleArray particles( param.maxparticles );
     the_emitter->init( &particles );
 
     // READY, SET, GO!
-    int max_t = static_cast<int>( duration * 2 * PI * radius / velocity / options.dt );
-    double interval = outputinterval;
+    int max_t = static_cast<int>( param.duration * 2 * PI * param.radius / param.velocity / options.dt );
+    double interval = param.outputinterval;
 
     // Needed to calculate the average fall time.
     double average_fall_time = 0;
@@ -610,11 +397,10 @@ int main( int argc, char* argv[] )
     //
     int t = 0;
 
-    FILE * f = fopen( datafile.c_str(), "a" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
-    writeToFile( 0, options, f, particles, the_vortex );
+    outputter->writeToFile( 0.0, particles );
 
     // If outputtype = 3, we're done so we can output and stop.
-    if ( outputtype == 3 )
+    if ( param.outputtype == 3 )
     {
         fclose( f );
         exit( 0 );
@@ -623,7 +409,7 @@ int main( int argc, char* argv[] )
     // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
     for ( t = 1; t <= max_t; t++ )
     {
-        double relative_time = t * duration / max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
+        double relative_time = t * param.duration / max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
         double time = (t * options.dt) / max_t; // Absolute time in seconds.
 
         writeProgress( (t * 100) / max_t ); // Display progress on stdout, e.g. [45%]
@@ -636,8 +422,8 @@ int main( int argc, char* argv[] )
         // Write to file
         if ( relative_time > interval )
         {
-            writeToFile( time, options, f, particles, the_vortex );
-            interval += outputinterval;
+            outputter->writeToFile( time, particles );
+            interval += param.outputinterval;
         }
 
         the_emitter->update( relative_time, &particles );
@@ -645,15 +431,12 @@ int main( int argc, char* argv[] )
         // Break when there are no more particles to plot.
         if ( particles.getLength() == 0 )
             break;
-
     }
 
-    fprintf(
-            f,
-            "\n# Amount of particles that left the box: %e\n# Mean amount of time the particles spent in the box:%e",
-            particles_out, average_fall_time );
-    fclose( f );
+
     delete the_vortex;
     delete the_emitter;
+    delete outputter;
     return 0;
 }
+

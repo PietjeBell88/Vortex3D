@@ -39,8 +39,9 @@ using std::cout;
 // Constructor
 BurgersVortex::BurgersVortex( const string &parameters, double radius, 
                               double velocity, double angle, double fl_mu, 
-                              double fl_density, bool interpolate, const string &roi ) :
-    Vortex( radius, velocity, angle, fl_mu, fl_density, interpolate, roi )
+                              double fl_density, bool interpolate, const string &roi, 
+                              bool rotategrav ) :
+    Vortex( radius, velocity, angle, fl_mu, fl_density, interpolate, roi, rotategrav )
 {
     //Evaluated LambartW function for alpha
     alpha = 2.5128624172523393539654752332184326538328336634026 * fl_nu / (radius * radius);

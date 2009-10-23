@@ -35,14 +35,13 @@
 #include <blitz/tinyvec.h>
 #include <blitz/tinyvec-et.h>
 
-#include "Typedefs.h"
+#include "..\Typedefs.h"
 
 
 /////////////
 // Namespace
-using blitz::TinyVector;
-using blitz::TinyMatrix;
 using std::string;
+using blitz::TinyMatrix;
 
 
 ////////////////
@@ -59,14 +58,15 @@ protected:
     double fl_mu;       // Fluid Dynamic Viscocity (Pa s).
     double fl_density;  // Fluid Density (kg/m3).
     double fl_nu;       // Fluid Kinematic Viscosity (m2/s).
-
+    
+    bool rotategrav;    // true -> rotate the gravity, false -> rotate the vortex
     bool interpolate;   // true = Interpolate a precalculated grid of the fluid velocity at the position of a particle, false = evaluate fluid velocity functions at particle position
-
+  
 
     ///////////////////////////////////////////////
     // Variables (Only Used when interpolate=true)
-    TinyVector<int, 3> grid;             // X x Y x Z grid of particles
-    TinyMatrix<double, 3, 2> delimiter;  //offsets
+    TGrid grid;             // X x Y x Z grid of particles
+    TDelimiter delimiter;  //offsets
 
     double dx, dy, dz;                   // Stepsizes of the grid.
 
@@ -78,8 +78,8 @@ protected:
     // Functions
 
     // Transformation Matrices
-    TinyMatrix<double, 3, 3> Cil2Cart( double phi );
-    TinyMatrix<double, 3, 3> Rotate_x( double angle );
+    TinyMatrix<double, 3, 3> cil2Cart( double phi );
+    TinyMatrix<double, 3, 3> rotate_x( double angle );
 
     // Interpolation
     Vector3d Interpolate3DCube( const VectorField &v, const Vector3d &pos );
@@ -99,7 +99,7 @@ protected:
 
 public:
 	Vortex( double radius, double velocity, double angle, double fl_mu, 
-            double fl_density, bool interpolate, const string &roi );
+            double fl_density, bool interpolate, const string &roi, bool rotategrav );
 
     virtual ~Vortex();
 

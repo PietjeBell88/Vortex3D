@@ -30,10 +30,16 @@
 #include "Vortex.h"
 
 
+/////////////
+// Namespace
+using std::string;
+using blitz::TinyMatrix;
+
+
 ///////////////
 // Constructor
 Vortex::Vortex( double radius, double velocity, double angle, double fl_mu, 
-			    double fl_density, bool interpolate, const string &roi )
+			    double fl_density, bool interpolate, const string &roi, bool rotategrav )
 {
     this->radius = radius;
     this->velocity = velocity;
@@ -42,6 +48,7 @@ Vortex::Vortex( double radius, double velocity, double angle, double fl_mu,
     this->fl_density = fl_density;
     this->fl_nu = fl_mu / fl_density;
     this->interpolate = interpolate;
+    this->rotategrav = rotategrav;
 
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
@@ -220,12 +227,18 @@ Vector3d Vortex::dudtCarthesian( const Vector3d &pos )
 
 Vector3d Vortex::velocityAngle( const Vector3d &pos )
 {
-    return product( rotate_x( angle ), velocityCarthesian( product( rotate_x( -angle ), pos ) ) );
+    if (rotategrav)
+        return velocityCarthesian( pos );
+    else
+        return product( rotate_x( angle ), velocityCarthesian( product( rotate_x( -angle ), pos ) ) );
 }
 
 Vector3d Vortex::dudtAngle( const Vector3d &pos )
 {
-    return product( rotate_x( angle ), dudtCarthesian( product( rotate_x( -angle ), pos ) ) );
+    if (rotategrav)
+        return dudtCarthesian( pos );
+    else
+        return product( rotate_x( angle ), dudtCarthesian( product( rotate_x( -angle ), pos ) ) );
 }
 
 

@@ -29,8 +29,8 @@
 // Headers
 #include "Emitter.h"
 
-#include "ParticleArray.h"
-#include "Particle.h"
+#include "..\ParticleArray.h"
+#include "..\Particle.h"
 
 
 ///////////////

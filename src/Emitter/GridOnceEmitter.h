@@ -26,38 +26,30 @@
 
 #pragma once
 
-///////////
-// Headers
-#include <blitz/array.h>
-#include "Typedefs.h"
+
+//////////
+//Headers
+#include "Emitter.h"
+#include "..\Typedefs.h"
 
 
-////////////////////////
-// Forward Declarations
-class Particle;
-
-
-/////////////////
-// ParticleArray
-class ParticleArray
+///////////////////
+// GridOnceEmitter
+class GridOnceEmitter: public Emitter
 {
-private:
-    int length; // Keeps track of how many particles there are.
-    int nextIndex; // Contains the index of the next particle when added.
-    blitz::Array<Particle, 1> particles; // The array for the particles.
+protected:
+    Vector3d startPos( int p );
+
+    Vector3d startVel( int p );
 
 public:
-    // Constructor
-    ParticleArray( int initiallength );
+    GridOnceEmitter( double p_density, double p_diameter, double p_velocity, 
+                 const string &dimensions, double radius, double p_rate,
+                 int reset_particles );
 
-    const Particle &getParticle( int p ) const;
-    void setParticle( int p, Particle particle );
+    virtual ~GridOnceEmitter();
 
-    int getLength() const;
+    virtual void init( ParticleArray *particles );
 
-    int getMaxLength() const;
-
-    void add( const Vector3d &pos, const Vector3d &vel, double relative_time );
-
-    Particle remove( int p );
+    virtual void update( double relative_time, ParticleArray *particles );
 };

@@ -34,7 +34,7 @@
 
 ////////////
 // Particle
-class Particle
+class Particle 
 {
 private:
     // TODO: Only keep track of startpos when using random emitters?
@@ -43,7 +43,7 @@ private:
     Vector3d vel;
     int num;
     double spawntime;
-
+    
 public:
     // Constructors
     Particle();

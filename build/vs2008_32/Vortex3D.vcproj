@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Vortex3D"
 	ProjectGUID="{D4423193-7F06-45F2-BD8A-AEFF115699D4}"
 	RootNamespace="Vortex3D"
@@ -255,90 +255,62 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Vortex"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\BurgersVortex.cpp"
+				RelativePath="..\..\src\Vortex\BurgersVortex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Emitter.cpp"
+				RelativePath="..\..\src\Vortex\BurgersVortex.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GridEmitter.cpp"
+				RelativePath="..\..\src\Vortex\Vortex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GridOnceEmitter.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Main.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Particle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ParticleArray.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\RandomEmitter.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Vortex.cpp"
+				RelativePath="..\..\src\Vortex\Vortex.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
+			Name="Emitter"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\BurgersVortex.h"
+				RelativePath="..\..\src\Emitter\Emitter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Emitter.h"
+				RelativePath="..\..\src\Emitter\Emitter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GridEmitter.h"
+				RelativePath="..\..\src\Emitter\GridEmitter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GridOnceEmitter.h"
+				RelativePath="..\..\src\Emitter\GridEmitter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Main.h"
+				RelativePath="..\..\src\Emitter\GridOnceEmitter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Particle.h"
+				RelativePath="..\..\src\Emitter\GridOnceEmitter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ParticleArray.h"
+				RelativePath="..\..\src\Emitter\RandomEmitter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\RandomEmitter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Typedefs.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Vortex.h"
+				RelativePath="..\..\src\Emitter\RandomEmitter.h"
 				>
 			</File>
 		</Filter>
@@ -355,6 +327,66 @@
 			</File>
 			<File
 				RelativePath="..\..\external\MTRand.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Main"
+			>
+			<File
+				RelativePath="..\..\src\Main.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Particle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Particle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ParticleArray.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ParticleArray.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Typedefs.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Output"
+			>
+			<File
+				RelativePath="..\..\src\Output\Output.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\Output.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\PythonOutput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\PythonOutput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\TecplotOutput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\TecplotOutput.h"
 				>
 			</File>
 		</Filter>

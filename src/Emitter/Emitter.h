@@ -24,62 +24,65 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#pragma once
+
 
 ///////////
 // Headers
-#include "GridOnceEmitter.h"
+#include <string.h>
 
-#include "ParticleArray.h"
-#include "Particle.h"
-
-
-////////////////////////////////////////
-// Constructor
-GridOnceEmitter::GridOnceEmitter( double p_density, double p_diameter, 
-                                  double p_velocity, const string &dimensions, 
-                                  double radius, double p_rate, int reset_particles ) :
-    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
-{}
+#include "..\Typedefs.h"
 
 
-//////////////
-// Destructor
-GridOnceEmitter::~GridOnceEmitter() {}
+////////////////////////
+// Forward Declarations
+class ParticleArray;
 
 
-////////////////////////////////////////
-// Particle Property Generators (private)
-Vector3d GridOnceEmitter::startPos( int p )
+/////////////
+// Namespace
+using std::string;
+
+
+///////////
+// Emmiter
+class Emitter
 {
-    // What variables are used in this function?
+protected:
+    // Local variables.
+    TGrid p_grid; // X x Y x Z grid of particles
+    TDelimiter delimiter; // The edges of the box.
+    double dx, dy, dz; // The stepsizes.
 
-    /*
-     * This function directly calculates the starting position from the
-     * particle number; this comes in handy when resetting particles, if
-     * they leave the cube, to the position they started;
-     */
-    int i = p / (( p_grid(1) ) * ( p_grid(2) ));
-    int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
-    int k = p % ( p_grid(2) );
+    // For the ones below, please see --help.
+    double p_density;
+    double p_diameter;
+    double p_velocity;
 
-    return Vector3d( delimiter(0, 0) + i * dx,
-                     delimiter(1, 0) + j * dy,
-                     delimiter(2, 0) + k * dz );
-}
+    double p_rate;
+    int reset_particles;
+    int p_N;
 
-Vector3d GridOnceEmitter::startVel( int p )
-{
-    return Vector3d( 0, 0, p_velocity );
-}
+    // Functions only used local in init(), update() and reset().
+    virtual Vector3d startPos( int p ) = 0;
 
+    virtual Vector3d startVel( int p ) = 0;
 
-////////////////////////////////////////
-// Init, Update (public), Reset is default
-void GridOnceEmitter::init( ParticleArray *particles )
-{
-    for ( int p = 0; p < p_N; p++ )
-        particles->add( startPos( p ), startVel( p ), 0 );
-}
+public:
+    Emitter( double p_density, double p_diameter, double p_velocity, 
+             const string &dimensions, double radius, double p_rate,
+             int reset_particles );
 
-void GridOnceEmitter::update( double relative_time, ParticleArray *particles )
-{}
+    virtual ~Emitter();
+
+    virtual void init( ParticleArray *particles ) = 0;
+
+    virtual void update( double relative_time, ParticleArray *particles ) = 0;
+
+    // reset():
+    // In:     - (1) The number of the particle to be reset.
+    //         - (2) The current relative time (as fraction of going around time T_l).
+    // In/Out: - (3) The particlearray of which the particle is to be removed.
+    // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
+    virtual double reset( int p, double relative_time, ParticleArray *particles );
+};
