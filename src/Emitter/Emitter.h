@@ -51,7 +51,7 @@ class Emitter
 {
 protected:
     // Local variables.
-    TGrid p_grid; // X x Y x Z grid of particles
+    TGrid grid; // X x Y x Z grid of particles
     TDelimiter delimiter; // The edges of the box.
     double dx, dy, dz; // The stepsizes.
 

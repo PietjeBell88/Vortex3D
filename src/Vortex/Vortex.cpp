@@ -49,32 +49,11 @@ Vortex::Vortex( const Vortex3dParam &param )
     this->interpolate = param.interpolate;
     this->rotategrav = param.rotategrav;
 
-    double x1, x2, y1, y2, z1, z2;
-    int X, Y, Z;
-
-    sscanf( param.roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
-            &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
-
-    delimiter = x1 * radius, x2 * radius,
-                y1 * radius, y2 * radius,
-                z1 * radius, z2 * radius;
-    grid = X, Y, Z;
-
-    // Calculate the stepsizes. Avoid dividing by zero.
-    if ( grid(0) <= 1 )
-        dx = 0;
-    else
-        dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
-
-    if ( grid(1) <= 1 )
-        dy = 0;
-    else
-        dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
-
-    if ( grid(2) <= 1 )
-        dz = 0;
-    else
-        dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
+    this->grid = param.roi_grid;
+    this->delimiter = param.roi_delimiter;
+    this->dx = param.roi_dx;
+    this->dx = param.roi_dy;
+    this->dx = param.roi_dz;
 }
 
 

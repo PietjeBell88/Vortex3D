@@ -62,16 +62,23 @@ struct Vortex3dParam {
     double dt;
     double beta; // This ratio is used in the equation of motion
     double tau_a;
-    // Used for concentration
-    TGrid grid; // X x Y x Z grid of resolution
-    TDelimiter delimiter; //offsets
-    bool tecplot;
-    double dx, dy, dz;
+
+    // Emitter
+    TGrid emitter_grid;
+    TDelimiter emitter_delimiter;
+    double emitter_dx, emitter_dy, emitter_dz;
+    int p_N;
+
+    // ROI
+    TGrid roi_grid;
+    TDelimiter roi_delimiter;
+    double roi_dx, roi_dy, roi_dz;
 };
 
 /////////////
 // Functions
-void readRoi( const string &roi, double radius, Vortex3dParam *param );
+void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
+                             TDelimiter *delimiter, double *dx, double *dy, double *dz );
 
 void getConcentration( const ParticleArray &particles, const Vortex3dParam &param,
                        ScalarField *concentration );

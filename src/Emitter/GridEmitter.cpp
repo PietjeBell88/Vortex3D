@@ -51,9 +51,9 @@ GridEmitter::~GridEmitter() {}
 // Particle Property Generators (private)
 Vector3d GridEmitter::startPos( int p )
 {
-    int i = p / (( p_grid(1) ) * ( p_grid(2) ));
-    int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
-    int k = p % ( p_grid(2) );
+    int i = p / (( grid(1) ) * ( grid(2) ));
+    int j = (p % (( grid(1) ) * ( grid(2) ))) / ( grid(2) + 1 );
+    int k = p % ( grid(2) );
 
     return Vector3d( delimiter(0, 0) + i * dx,
                      delimiter(1, 0) + j * dy,

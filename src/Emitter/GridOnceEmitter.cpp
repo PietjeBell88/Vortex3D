@@ -56,9 +56,9 @@ Vector3d GridOnceEmitter::startPos( int p )
      * particle number; this comes in handy when resetting particles, if
      * they leave the cube, to the position they started;
      */
-    int i = p / (( p_grid(1) ) * ( p_grid(2) ));
-    int j = (p % (( p_grid(1) ) * ( p_grid(2) ))) / ( p_grid(2) + 1 );
-    int k = p % ( p_grid(2) );
+    int i = p / (( grid(1) ) * ( grid(2) ));
+    int j = (p % (( grid(1) ) * ( grid(2) ))) / ( grid(2) + 1 );
+    int k = p % ( grid(2) );
 
     return Vector3d( delimiter(0, 0) + i * dx,
                      delimiter(1, 0) + j * dy,

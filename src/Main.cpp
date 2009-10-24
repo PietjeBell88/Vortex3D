@@ -66,39 +66,6 @@ using std::cout;
 
 ////////////
 // Sutaato!
-void readRoi( const string &roi, double radius, Vortex3dParam *param )
-{
-    double x1, x2, y1, y2, z1, z2;
-    int X, Y, Z;
-
-    // Read the values into the variables.
-    sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2,
-            &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
-
-    param->delimiter = x1 * radius, x2 * radius,
-                         y1 * radius, y2 * radius,
-                         z1 * radius, z2 * radius;
-    param->grid = X, Y, Z;
-
-    // Readability:
-    TGrid & grid = param->grid; 
-    TDelimiter & delimiter = param->delimiter;
-
-    // Set dx/dy/dz, and do some checks on them.
-    param->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
-    param->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
-    param->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
-
-    if ( grid(0) <= 1 )
-        param->dx = 0;
-
-    if ( grid(1) <= 1 )
-        param->dy = 0;
-
-    if ( grid(2) <= 1 )
-        param->dz = 0;
-}
-
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                     ParticleArray *particles, const Vortex3dParam &param )
 {
@@ -301,7 +268,16 @@ int main( int argc, char* argv[] )
     param.fl_nu = param.fl_mu / param.fl_density;
 
     param.p_velocity = (1 - (1 / param.beta)) * param.p_velocity * param.systemtime * -9.81;
-    readRoi( param.roi, param.radius, &param ); // Write some settings to param
+
+    // Read grid+delimiter+deltas for ROI.
+    readGridDelimiterDelta( param.roi, param.radius, &param.roi_grid, &param.roi_delimiter, 
+                            &param.roi_dx, &param.roi_dy, &param.roi_dz );
+    // Read grid+delimiter+deltas for Emitter.
+    readGridDelimiterDelta( param.dimensions, param.radius, &param.emitter_grid, &param.emitter_delimiter, 
+                            &param.emitter_dx, &param.emitter_dy, &param.emitter_dz );
+
+
+    param.p_N = product( param.emitter_grid );
 
     // Parameter Checking:
     // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
@@ -311,17 +287,8 @@ int main( int argc, char* argv[] )
     // In case of the GridEmitters (1 and 2) maxparticles should be at least the size of one grid.
     if ( param.emittertype == 1 || param.emittertype == 2 )
     {
-        double x1, x2, y1, y2, z1, z2;
-        int X, Y, Z;
-
-
-        sscanf( param.dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
-                &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
-
-        int p_N = X * Y * Z;
-
-        if ( param.maxparticles < p_N )
-            param.maxparticles = p_N;
+        if ( param.maxparticles < param.p_N )
+            param.maxparticles = param.p_N;
     }
 
 
@@ -436,3 +403,39 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
+
+///////////////////////////
+// Parse formatted strings
+void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
+                             TDelimiter *delimiter, double *dx, double *dy, double *dz )
+{
+    double x1, x2, y1, y2, z1, z2;
+    int X, Y, Z;
+
+    // Read the values into the variables.
+    sscanf( fstring.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2,
+            &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
+
+    *delimiter = x1 * radius, x2 * radius,
+                 y1 * radius, y2 * radius,
+                 z1 * radius, z2 * radius;
+    *grid = X, Y, Z;
+
+    // Readability:
+    TDelimiter _delimiter = *delimiter;
+    TGrid _grid = *grid;
+
+    // Set dx/dy/dz, and do some checks on them.
+    *dx = ( _delimiter(0, 1) - _delimiter(0, 0) ) / ( _grid(0) - 1 );
+    *dy = ( _delimiter(1, 1) - _delimiter(1, 0) ) / ( _grid(1) - 1 );
+    *dz = ( _delimiter(2, 1) - _delimiter(2, 0) ) / ( _grid(2) - 1 );
+
+    if ( _grid(0) <= 1 )
+        *dx = 0;
+
+    if ( _grid(1) <= 1 )
+        *dy = 0;
+
+    if ( _grid(2) <= 1 )
+        *dz = 0;
+}

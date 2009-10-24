@@ -43,37 +43,13 @@ Emitter::Emitter( const Vortex3dParam &param )
     this->p_velocity = param.p_velocity;
     this->reset_particles = param.reset_particles;
     this->p_rate = param.p_rate;
+    this->p_N = param.p_N;
 
-    // Calculate the delimiter, grid size (p_grid) and the stepsize (dx, dy and dz).
-    double x1, x2, y1, y2, z1, z2;
-    int X, Y, Z;
-
-    sscanf( param.dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
-            &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
-
-    delimiter = x1 * param.radius, x2 * param.radius,
-                y1 * param.radius, y2 * param.radius,
-                z1 * param.radius, z2 * param.radius;
-
-    // Calculate the grid size.
-    p_grid = X, Y, Z;
-    p_N = product( p_grid );
-
-    // Calculate the stepsizes. Avoid dividing by zero.
-    if ( p_grid(0) <= 1 )
-        dx = 0;
-    else
-        dx = (delimiter(0, 1) - delimiter(0, 0)) / (p_grid(0) - 1);
-
-    if ( p_grid(1) <= 1 )
-        dy = 0;
-    else
-        dy = (delimiter(1, 1) - delimiter(1, 0)) / (p_grid(1) - 1);
-
-    if ( p_grid(2) <= 1 )
-        dz = 0;
-    else
-        dz = (delimiter(2, 1) - delimiter(2, 0)) / (p_grid(2) - 1);
+    this->grid = param.emitter_grid;
+    this->delimiter = param.emitter_delimiter;
+    this->dx = param.emitter_dx;
+    this->dx = param.emitter_dy;
+    this->dx = param.emitter_dz;
 }
 
 

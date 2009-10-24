@@ -40,23 +40,14 @@
 Output::Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) 
 {
     this->f = f;
-    this->grid = param.grid;
-    this->delimiter = param.delimiter;
     this->the_vortex = the_vortex;
     this->outputtype = param.outputtype;
 
-    this->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
-    this->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
-    this->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
-
-    if ( grid(0) <= 1 )
-        this->dx = 0;
-
-    if ( grid(1) <= 1 )
-        this->dy = 0;
-
-    if ( grid(2) <= 1 )
-        this->dz = 0;
+    this->grid = param.roi_grid;
+    this->delimiter = param.roi_delimiter;
+    this->dx = param.roi_dx;
+    this->dy = param.roi_dy;
+    this->dz = param.roi_dz;
 }
 
 
