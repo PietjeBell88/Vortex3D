@@ -38,8 +38,9 @@
 ParticleArray::ParticleArray( int initiallength )
 {
     particles.resize( initiallength );
-    nextIndex = 0;
+
     length = 0;
+    nextIndex = 0;
 }
 
 

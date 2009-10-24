@@ -38,12 +38,15 @@ class Particle
 {
 private:
     // TODO: Only keep track of startpos when using random emitters?
+    // History values
     Vector3d startPos;
+    double spawntime;
+    
+    // Particle properties
     Vector3d pos;
     Vector3d vel;
     int num;
-    double spawntime;
-    
+        
 public:
     // Constructors
     Particle();

@@ -34,8 +34,8 @@
 #include "../Vortex/Vortex.h" 
 
 
-TecplotOutput::TecplotOutput( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) : 
-                          Output(f, param, the_vortex) 
+TecplotOutput::TecplotOutput( const Vortex3dParam &param, Vortex *the_vortex, FILE * f ) : 
+                          Output( param, the_vortex, f ) 
 {
 }
  

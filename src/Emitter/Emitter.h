@@ -50,19 +50,23 @@ using std::string;
 class Emitter
 {
 protected:
-    // Local variables.
-    TGrid grid; // X x Y x Z grid of particles
-    TDelimiter delimiter; // The edges of the box.
-    double dx, dy, dz; // The stepsizes.
-
-    // For the ones below, please see --help.
+    // Particle properties
     double p_density;
     double p_diameter;
     double p_velocity;
 
-    double p_rate;
-    int reset_particles;
+    // Emitter properties
+    TGrid grid; // X x Y x Z grid of particles
+    TDelimiter delimiter; // The edges of the box.
+    double dx, dy, dz; // The stepsizes.
     int p_N;
+    
+    // Emitter rate
+    double p_rate;
+
+    // Other
+    int reset_particles;
+
 
     // Functions only used local in init(), update() and reset().
     virtual Vector3d startPos( int p ) = 0;

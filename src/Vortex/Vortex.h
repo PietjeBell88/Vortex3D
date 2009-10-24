@@ -52,24 +52,20 @@ class Vortex
 protected:
     /////////////
     // Variables
-    double angle;       // Angle of the vortex with the z-axis, clockwise when looking along the y-axis in a rh coordinate system.
     double radius;      // Typical radius of the vortex
     double velocity;    // Velocity at radius
-
+    double angle;       // Angle of the vortex with the z-axis, clockwise when looking along the y-axis in a rh coordinate system.
+    
     double fl_mu;       // Fluid Dynamic Viscocity (Pa s).
     double fl_density;  // Fluid Density (kg/m3).
     double fl_nu;       // Fluid Kinematic Viscosity (m2/s).
     
-    bool rotategrav;    // true -> rotate the gravity, false -> rotate the vortex
     bool interpolate;   // true = Interpolate a precalculated grid of the fluid velocity at the position of a particle, false = evaluate fluid velocity functions at particle position
-  
+    bool rotategrav;    // true -> rotate the gravity, false -> rotate the vortex
 
-    ///////////////////////////////////////////////
-    // Variables (Only Used when interpolate=true)
     TGrid grid;             // X x Y x Z grid of particles
-    TDelimiter delimiter;  //offsets
-
-    double dx, dy, dz;                   // Stepsizes of the grid.
+    TDelimiter delimiter;   // Offsets
+    double dx, dy, dz;      // Stepsizes of the grid.
 
     VectorField v;
     VectorField accelfluid;

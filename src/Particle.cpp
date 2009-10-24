@@ -40,15 +40,16 @@ Particle::Particle() {
 
 Particle::Particle( int num, const Vector3d &pos, const Vector3d &vel, double spawntime )
 {
-    this->num = num;
-    this->pos = pos;
     this->startPos = pos;
-    this->vel = vel;
     this->spawntime = spawntime;
+
+    this->pos = pos;
+    this->vel = vel;
+    this->num = num;
 }
 
 
-////////////////////////////////////////
+///////////////////////
 // Getters and Setters
 const Vector3d &Particle::getPos() const
 {

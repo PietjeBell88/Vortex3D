@@ -37,8 +37,8 @@
 
 ///////////////
 // Constructor
-PythonOutput::PythonOutput( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) : 
-                          Output(f, param, the_vortex) 
+PythonOutput::PythonOutput( const Vortex3dParam &param, Vortex *the_vortex, FILE * f ) : 
+                          Output( param, the_vortex, f ) 
 {
 }
 

@@ -42,9 +42,10 @@ class Particle;
 class ParticleArray
 {
 private:
+    blitz::Array<Particle, 1> particles; // The array for the particles.
+
     int length; // Keeps track of how many particles there are.
     int nextIndex; // Contains the index of the next particle when added.
-    blitz::Array<Particle, 1> particles; // The array for the particles.
 
 public:
     // Constructor

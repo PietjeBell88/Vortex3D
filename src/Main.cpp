@@ -336,10 +336,10 @@ int main( int argc, char* argv[] )
 
     switch ( param.outputformat ) {
         case 1:
-            outputter = new PythonOutput( f, param, the_vortex );
+            outputter = new PythonOutput( param, the_vortex, f );
             break;
         case 2:
-            outputter = new TecplotOutput( f, param, the_vortex );
+            outputter = new TecplotOutput( param, the_vortex, f );
             break;
         default:
             cout << "Unknown outputformat.";

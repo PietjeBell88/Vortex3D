@@ -40,19 +40,28 @@ class Vortex;
 class ParticleArray;
 
 
-//////////
+///////////////
 // Output
 class Output
 {
 protected:
-    FILE * f;                           // Output file.
-    TGrid grid;            // X x Y x Z grid of resolution
-    TDelimiter delimiter; // Offsets
-    Vortex *the_vortex;
-    double dx, dy, dz;
-    int outputtype;
-    Vortex3dParam param;
+    /////////////
+    // Variables
+    int outputtype;        // Particle positions, concentration, velocity field etc..  (See help)
 
+    TGrid grid;            // X x Y x Z grid of resolution
+    TDelimiter delimiter;  // Offsets
+    double dx, dy, dz;     // deltas
+
+    Vortex *the_vortex;    // The Vortex (used when emitting velocity field)
+
+    FILE * f;              // Output file.
+
+    Vortex3dParam param;   // To output the cmdline options to file when wanted.
+
+
+    /////////////
+    // Functions
     void getConcentration( const ParticleArray &particles, ScalarField *concentration );
 
     virtual void printFileHeader();
@@ -63,7 +72,7 @@ protected:
     virtual void writeVelocityField( bool first_call, double time ) = 0;
 
 public:
-    Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex );
+    Output( const Vortex3dParam &param, Vortex *the_vortex, FILE * f );
 
     virtual ~Output();
 

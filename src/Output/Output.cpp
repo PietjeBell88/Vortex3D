@@ -37,10 +37,8 @@
 
 //////////////
 // Constructor
-Output::Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) 
+Output::Output( const Vortex3dParam &param, Vortex *the_vortex, FILE * f ) 
 {
-    this->f = f;
-    this->the_vortex = the_vortex;
     this->outputtype = param.outputtype;
 
     this->grid = param.roi_grid;
@@ -48,6 +46,12 @@ Output::Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex )
     this->dx = param.roi_dx;
     this->dy = param.roi_dy;
     this->dz = param.roi_dz;
+
+    this->the_vortex = the_vortex;
+
+    this->f = f;
+
+    this->param = param;
 }
 
 
