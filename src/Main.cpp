@@ -66,7 +66,7 @@ using std::cout;
 
 ////////////
 // Sutaato!
-void readRoi( const string &roi, double radius, Settings *options )
+void readRoi( const string &roi, double radius, Vortex3dParam *param )
 {
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
@@ -75,38 +75,38 @@ void readRoi( const string &roi, double radius, Settings *options )
     sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]", &x1, &X, &x2,
             &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
 
-    options->delimiter = x1 * radius, x2 * radius,
+    param->delimiter = x1 * radius, x2 * radius,
                          y1 * radius, y2 * radius,
                          z1 * radius, z2 * radius;
-    options->grid = X, Y, Z;
+    param->grid = X, Y, Z;
 
     // Readability:
-    TGrid & grid = options->grid; 
-    TDelimiter & delimiter = options->delimiter;
+    TGrid & grid = param->grid; 
+    TDelimiter & delimiter = param->delimiter;
 
     // Set dx/dy/dz, and do some checks on them.
-    options->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
-    options->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
-    options->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
+    param->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
+    param->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);
+    param->dz = (delimiter(2, 1) - delimiter(2, 0)) / (grid(2) - 1);
 
     if ( grid(0) <= 1 )
-        options->dx = 0;
+        param->dx = 0;
 
     if ( grid(1) <= 1 )
-        options->dy = 0;
+        param->dy = 0;
 
     if ( grid(2) <= 1 )
-        options->dz = 0;
+        param->dz = 0;
 }
 
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
-                    ParticleArray *particles, const Settings &options )
+                    ParticleArray *particles, const Vortex3dParam &param )
 {
     // Readability reference variables (Hopefully these will be optimized away).
-    const Vector3d & gravity = options.gravity;
-    const double & dt = options.dt;
-    const double & beta = options.beta;
-    const double & tau_a = options.tau_a;
+    const Vector3d & gravity = param.gravity;
+    const double & dt = param.dt;
+    const double & beta = param.beta;
+    const double & tau_a = param.tau_a;
 
     /* 
      * Include Drag, Gravity, Stresses and Added Mass in the equation of motion.
@@ -284,24 +284,23 @@ int main( int argc, char* argv[] )
      ;
 
     //gedoe
-    Settings options;
-    options.systemtime = param.p_density * param.p_diameter * param.p_diameter / (18 * param.fl_mu);
+    param.systemtime = param.p_density * param.p_diameter * param.p_diameter / (18 * param.fl_mu);
 
     // Set the proper gravity.
     if (!param.rotategrav)
-        options.gravity = Vector3d( 0, 0, -9.81 * param.grav );
+        param.gravity = Vector3d( 0, 0, -9.81 * param.grav );
     else
-        options.gravity = Vector3d( 0, sin(param.angle), -cos(param.angle) );
+        param.gravity = Vector3d( 0, sin(param.angle), -cos(param.angle) );
 
-    options.dt = param.dtscale * options.systemtime;
-    options.reset_particles = param.reset_particles;
-    options.beta = param.p_density / param.fl_density; // This ratio is used in the equation of motion
-    options.tau_a = (options.beta + 0.5) / options.beta * options.systemtime;
-    options.datafile = param.datafile;
-    options.outputtype = param.outputtype;
+    param.dt = param.dtscale * param.systemtime;
+    param.reset_particles = param.reset_particles;
+    param.beta = param.p_density / param.fl_density; // This ratio is used in the equation of motion
+    param.tau_a = (param.beta + 0.5) / param.beta * param.systemtime;
+    param.datafile = param.datafile;
+    param.outputtype = param.outputtype;
 
-    param.p_velocity = (1 - (1 / options.beta)) * param.p_velocity * options.systemtime * -9.81;
-    readRoi( param.roi, param.radius, &options ); // Write some settings to options
+    param.p_velocity = (1 - (1 / param.beta)) * param.p_velocity * param.systemtime * -9.81;
+    readRoi( param.roi, param.radius, &param ); // Write some settings to param
 
     // Parameter Checking:
     // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
@@ -373,10 +372,10 @@ int main( int argc, char* argv[] )
 
     switch ( param.outputformat ) {
         case 1:
-            outputter = new PythonOutput( f, options.grid, options.delimiter, param.outputtype, the_vortex );
+            outputter = new PythonOutput( f, param.grid, param.delimiter, param.outputtype, the_vortex );
             break;
         case 2:
-            outputter = new TecplotOutput( f, options.grid, options.delimiter, param.outputtype, the_vortex );
+            outputter = new TecplotOutput( f, param.grid, param.delimiter, param.outputtype, the_vortex );
             break;
         default:
             cout << "Unknown outputformat.";
@@ -387,7 +386,7 @@ int main( int argc, char* argv[] )
     the_emitter->init( &particles );
 
     // READY, SET, GO!
-    int max_t = static_cast<int>( param.duration * 2 * PI * param.radius / param.velocity / options.dt );
+    int max_t = static_cast<int>( param.duration * 2 * PI * param.radius / param.velocity / param.dt );
     double interval = param.outputinterval;
 
     // Needed to calculate the average fall time.
@@ -410,12 +409,12 @@ int main( int argc, char* argv[] )
     for ( t = 1; t <= max_t; t++ )
     {
         double relative_time = t * param.duration / max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
-        double time = (t * options.dt) / max_t; // Absolute time in seconds.
+        double time = (t * param.dt) / max_t; // Absolute time in seconds.
 
         writeProgress( (t * 100) / max_t ); // Display progress on stdout, e.g. [45%]
 
         // Move the particles
-        moveParticles( the_vortex, the_emitter, &particles, options );
+        moveParticles( the_vortex, the_emitter, &particles, param );
         checkParticles( the_vortex, the_emitter, &particles, relative_time,
                 &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
 

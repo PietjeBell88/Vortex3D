@@ -47,16 +47,20 @@ class ParticleArray;
 
 ///////////////////
 // Global Settings
-struct Settings
-{
+struct Vortex3dParam {
+    // Cmdline parameters
+    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat;
+    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
+           duration, p_velocity, outputinterval, dtscale, p_rate;
+    bool interpolate, rotategrav;
+    string parameters, roi, dimensions, datafile;
+
+    // Calculated parameters
     double systemtime;
     Vector3d gravity;
     double dt;
-    int reset_particles;
     double beta; // This ratio is used in the equation of motion
     double tau_a;
-    string datafile;
-    int outputtype;
     // Used for concentration
     TGrid grid; // X x Y x Z grid of resolution
     TDelimiter delimiter; //offsets
@@ -64,23 +68,15 @@ struct Settings
     double dx, dy, dz;
 };
 
-struct Vortex3dParam {
-    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat;
-    double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
-           duration, p_velocity, outputinterval, dtscale, p_rate;
-    bool interpolate, rotategrav;
-    string parameters, roi, dimensions, datafile;
-};
-
 /////////////
 // Functions
-void readRoi( const string &roi, double radius, Settings *options );
+void readRoi( const string &roi, double radius, Vortex3dParam *param );
 
-void getConcentration( const ParticleArray &particles, const Settings &options,
+void getConcentration( const ParticleArray &particles, const Vortex3dParam &param,
                        ScalarField *concentration );
 
 void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
-                    ParticleArray *particles, const Settings &options );
+                    ParticleArray *particles, const Vortex3dParam &param );
 void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
                      ParticleArray *particles, double relative_time,
                      double *average_fall_time, double *particles_out );
