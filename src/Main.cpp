@@ -298,6 +298,7 @@ int main( int argc, char* argv[] )
     param.tau_a = (param.beta + 0.5) / param.beta * param.systemtime;
     param.datafile = param.datafile;
     param.outputtype = param.outputtype;
+    param.fl_nu = param.fl_mu / param.fl_density;
 
     param.p_velocity = (1 - (1 / param.beta)) * param.p_velocity * param.systemtime * -9.81;
     readRoi( param.roi, param.radius, &param ); // Write some settings to param
@@ -330,8 +331,7 @@ int main( int argc, char* argv[] )
 
     switch ( param.vortextype ) {
         case 1:
-            the_vortex = new BurgersVortex( param.parameters, param.radius, param.velocity, param.angle,
-                param.fl_mu, param.fl_density, param.interpolate, param.roi, param.rotategrav );
+            the_vortex = new BurgersVortex( param );
             break;
         default:
             cout << "Unknown Vortex type";
@@ -349,16 +349,13 @@ int main( int argc, char* argv[] )
     
     switch ( param.emittertype ) {
         case 1:
-            the_emitter = new GridOnceEmitter( param.p_density, param.p_diameter, param.p_velocity,
-                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            the_emitter = new GridOnceEmitter( param );
             break;
         case 2:
-            the_emitter = new GridEmitter( param.p_density, param.p_diameter, param.p_velocity,
-                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            the_emitter = new GridEmitter( param );
             break;
         case 3:
-            the_emitter = new RandomEmitter( param.p_density, param.p_diameter, param.p_velocity,
-                param.dimensions, param.radius, param.p_rate, param.reset_particles );
+            the_emitter = new RandomEmitter( param );
             break;
         default:
             cout << "Unknown Emitter type";
@@ -372,10 +369,10 @@ int main( int argc, char* argv[] )
 
     switch ( param.outputformat ) {
         case 1:
-            outputter = new PythonOutput( f, param.grid, param.delimiter, param.outputtype, the_vortex );
+            outputter = new PythonOutput( f, param, the_vortex );
             break;
         case 2:
-            outputter = new TecplotOutput( f, param.grid, param.delimiter, param.outputtype, the_vortex );
+            outputter = new TecplotOutput( f, param, the_vortex );
             break;
         default:
             cout << "Unknown outputformat.";

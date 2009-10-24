@@ -32,6 +32,7 @@
 #include "Emitter.h"
 
 #include "..\Typedefs.h"
+#include "..\Main.h"
 
 
 ///////////////
@@ -42,9 +43,7 @@ protected:
     double last_emit_time; // Relative time at which the last particles were emitted
 
 public:
-    GridEmitter( double p_density, double p_diameter, double p_velocity, 
-                 const string &dimensions, double radius, double p_rate,
-                 int reset_particles );
+    GridEmitter( const Vortex3dParam &param );
 
     virtual ~GridEmitter();
 

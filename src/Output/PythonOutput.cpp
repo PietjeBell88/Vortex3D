@@ -37,9 +37,8 @@
 
 ///////////////
 // Constructor
-PythonOutput::PythonOutput( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
-                            int outputtype, Vortex *the_vortex ) : 
-                          Output(f, grid, delimiter, outputtype, the_vortex) 
+PythonOutput::PythonOutput( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) : 
+                          Output(f, param, the_vortex) 
 {
 }
 

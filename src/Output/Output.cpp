@@ -37,13 +37,13 @@
 
 //////////////
 // Constructor
-Output::Output( FILE * f, const TGrid &grid, const TDelimiter &delimiter, int outputtype, Vortex *the_vortex ) 
+Output::Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) 
 {
     this->f = f;
-    this->grid = grid;
-    this->delimiter = delimiter;
+    this->grid = param.grid;
+    this->delimiter = param.delimiter;
     this->the_vortex = the_vortex;
-    this->outputtype = outputtype;
+    this->outputtype = param.outputtype;
 
     this->dx = (delimiter(0, 1) - delimiter(0, 0)) / (grid(0) - 1);
     this->dy = (delimiter(1, 1) - delimiter(1, 0)) / (grid(1) - 1);

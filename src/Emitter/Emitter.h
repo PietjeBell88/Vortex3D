@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "..\Typedefs.h"
+#include "..\Main.h"
 
 
 ////////////////////////
@@ -69,9 +70,7 @@ protected:
     virtual Vector3d startVel( int p ) = 0;
 
 public:
-    Emitter( double p_density, double p_diameter, double p_velocity, 
-             const string &dimensions, double radius, double p_rate,
-             int reset_particles );
+    Emitter( const Vortex3dParam &param );
 
     virtual ~Emitter();
 

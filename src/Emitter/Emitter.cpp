@@ -35,27 +35,25 @@
 
 ///////////////
 // Constructor
-Emitter::Emitter( double p_density, double p_diameter, double p_velocity, 
-                  const string &dimensions, double radius, double p_rate,
-                  int reset_particles )
+Emitter::Emitter( const Vortex3dParam &param )
 {
     // Save the variables.
-    this->p_density = p_density;
-    this->p_diameter = p_diameter;
-    this->p_velocity = p_velocity;
-    this->reset_particles = reset_particles;
-    this->p_rate = p_rate;
+    this->p_density = param.p_density;
+    this->p_diameter = param.p_diameter;
+    this->p_velocity = param.p_velocity;
+    this->reset_particles = param.reset_particles;
+    this->p_rate = param.p_rate;
 
     // Calculate the delimiter, grid size (p_grid) and the stepsize (dx, dy and dz).
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
 
-    sscanf( dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+    sscanf( param.dimensions.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
             &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
 
-    delimiter = x1 * radius, x2 * radius,
-                y1 * radius, y2 * radius,
-                z1 * radius, z2 * radius;
+    delimiter = x1 * param.radius, x2 * param.radius,
+                y1 * param.radius, y2 * param.radius,
+                z1 * param.radius, z2 * param.radius;
 
     // Calculate the grid size.
     p_grid = X, Y, Z;

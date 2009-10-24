@@ -30,6 +30,7 @@
 //////////
 //Headers
 #include "Emitter.h"
+
 #include "..\Typedefs.h"
 
 
@@ -46,9 +47,7 @@ protected:
     virtual Vector3d startVel( int p );
 
 public:
-    RandomEmitter( double p_density, double p_diameter, double p_velocity, 
-                   const string &dimensions, double radius, double p_rate,
-                   int reset_particles );
+    RandomEmitter( const Vortex3dParam &param );
 
     virtual ~RandomEmitter();
 

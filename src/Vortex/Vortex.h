@@ -36,6 +36,7 @@
 #include <blitz/tinyvec-et.h>
 
 #include "..\Typedefs.h"
+#include "..\Main.h"
 
 
 /////////////
@@ -98,8 +99,7 @@ protected:
     void SetupVortexGrid( VectorField *v, VectorField *accelfluid );
 
 public:
-	Vortex( double radius, double velocity, double angle, double fl_mu, 
-            double fl_density, bool interpolate, const string &roi, bool rotategrav );
+	Vortex( const Vortex3dParam &param );
 
     virtual ~Vortex();
 

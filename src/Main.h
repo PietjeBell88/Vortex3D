@@ -56,6 +56,7 @@ struct Vortex3dParam {
     string parameters, roi, dimensions, datafile;
 
     // Calculated parameters
+    double fl_nu;
     double systemtime;
     Vector3d gravity;
     double dt;

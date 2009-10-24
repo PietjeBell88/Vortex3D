@@ -34,9 +34,8 @@
 #include "../Vortex/Vortex.h" 
 
 
-TecplotOutput::TecplotOutput( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
-                              int outputtype, Vortex *the_vortex ) : 
-                          Output(f, grid, delimiter, outputtype, the_vortex) 
+TecplotOutput::TecplotOutput( FILE * f, const Vortex3dParam &param, Vortex *the_vortex ) : 
+                          Output(f, param, the_vortex) 
 {
 }
  

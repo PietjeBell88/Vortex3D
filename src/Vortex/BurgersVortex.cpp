@@ -37,11 +37,8 @@ using std::cout;
 
 ///////////////
 // Constructor
-BurgersVortex::BurgersVortex( const string &parameters, double radius, 
-                              double velocity, double angle, double fl_mu, 
-                              double fl_density, bool interpolate, const string &roi, 
-                              bool rotategrav ) :
-    Vortex( radius, velocity, angle, fl_mu, fl_density, interpolate, roi, rotategrav )
+BurgersVortex::BurgersVortex( const Vortex3dParam &param ) :
+    Vortex( param )
 {
     //Evaluated LambartW function for alpha
     alpha = 2.5128624172523393539654752332184326538328336634026 * fl_nu / (radius * radius);
@@ -50,14 +47,14 @@ BurgersVortex::BurgersVortex( const string &parameters, double radius,
     cout << "alpha: " << alpha << "\n";
     cout << "kappa: " << kappa << "\n";
 
-    if ( parameters == "" )
+    if ( param.parameters == "" )
     {
         stretching_r = 1;
         stretching_z = 1;
     }
     else
     {
-        sscanf( parameters.c_str(), "%lf,%lf", &stretching_r, &stretching_z ); //"1,1"
+        sscanf( param.parameters.c_str(), "%lf,%lf", &stretching_r, &stretching_z ); //"1,1"
     }
 }
 

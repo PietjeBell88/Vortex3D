@@ -38,22 +38,21 @@ using blitz::TinyMatrix;
 
 ///////////////
 // Constructor
-Vortex::Vortex( double radius, double velocity, double angle, double fl_mu, 
-			    double fl_density, bool interpolate, const string &roi, bool rotategrav )
+Vortex::Vortex( const Vortex3dParam &param )
 {
-    this->radius = radius;
-    this->velocity = velocity;
-    this->angle = angle;
-    this->fl_mu = fl_mu;
-    this->fl_density = fl_density;
-    this->fl_nu = fl_mu / fl_density;
-    this->interpolate = interpolate;
-    this->rotategrav = rotategrav;
+    this->radius = param.radius;
+    this->velocity = param.velocity;
+    this->angle = param.angle;
+    this->fl_mu = param.fl_mu;
+    this->fl_density = param.fl_density;
+    this->fl_nu = param.fl_nu;
+    this->interpolate = param.interpolate;
+    this->rotategrav = param.rotategrav;
 
     double x1, x2, y1, y2, z1, z2;
     int X, Y, Z;
 
-    sscanf( roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
+    sscanf( param.roi.c_str(), "[%lf:%d:%lf,%lf:%d:%lf,%lf:%d:%lf]",
             &x1, &X, &x2, &y1, &Y, &y2, &z1, &Z, &z2 ); //e.g. [-4:30:4,0:1:0,4:1:4]"
 
     delimiter = x1 * radius, x2 * radius,

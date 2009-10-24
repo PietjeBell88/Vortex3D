@@ -30,6 +30,7 @@
 //////////
 //Headers
 #include "Emitter.h"
+
 #include "..\Typedefs.h"
 
 
@@ -43,9 +44,7 @@ protected:
     Vector3d startVel( int p );
 
 public:
-    GridOnceEmitter( double p_density, double p_diameter, double p_velocity, 
-                 const string &dimensions, double radius, double p_rate,
-                 int reset_particles );
+    GridOnceEmitter( const Vortex3dParam &param );
 
     virtual ~GridOnceEmitter();
 

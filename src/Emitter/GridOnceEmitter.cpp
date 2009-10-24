@@ -35,10 +35,8 @@
 
 ////////////////////////////////////////
 // Constructor
-GridOnceEmitter::GridOnceEmitter( double p_density, double p_diameter, 
-                                  double p_velocity, const string &dimensions, 
-                                  double radius, double p_rate, int reset_particles ) :
-    Emitter( p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles )
+GridOnceEmitter::GridOnceEmitter( const Vortex3dParam &param ) :
+    Emitter( param )
 {}
 
 

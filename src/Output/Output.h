@@ -63,8 +63,7 @@ protected:
     virtual void writeVelocityField( bool first_call, double time ) = 0;
 
 public:
-    Output( FILE * f, const TGrid &grid, const TDelimiter &delimiter, 
-            int outputtype, Vortex *the_vortex );
+    Output( FILE * f, const Vortex3dParam &param, Vortex *the_vortex );
 
     virtual ~Output();
 

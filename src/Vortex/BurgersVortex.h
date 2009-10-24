@@ -49,9 +49,7 @@ protected:
     virtual inline Vector3d dudtCylinder( double r, double phi, double z );
 
 public:
-    BurgersVortex( const string &parameters, double radius, double velocity, 
-                   double angle, double fl_mu, double fl_density, 
-                   bool interpolate, const string &roi, bool rotategrav );
+    BurgersVortex( const Vortex3dParam &param );
 
     virtual ~BurgersVortex();
 };
