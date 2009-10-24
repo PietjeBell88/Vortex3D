@@ -332,7 +332,7 @@ int main( int argc, char* argv[] )
 
     // Making the Output
     Output * outputter;
-    FILE * f = fopen( param.datafile.c_str(), "a" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
+    FILE * f = fopen( param.datafile.c_str(), "w" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
 
     switch ( param.outputformat ) {
         case 1:
