@@ -37,7 +37,7 @@
 
 //////////////
 // Constructor
-Output::Output( const Vortex3dParam &param, Vortex *the_vortex, FILE * f ) 
+Output::Output( const Vortex3dParam &param, Vortex *the_vortex ) 
 {
     this->outputtype = param.outputtype;
 
@@ -49,9 +49,7 @@ Output::Output( const Vortex3dParam &param, Vortex *the_vortex, FILE * f )
 
     this->the_vortex = the_vortex;
 
-    this->f = f;
-
-    this->param = param;
+    this->param = param; // only needed for outputting cmdline options
 }
 
 
@@ -113,4 +111,3 @@ void Output::writeToFile( double time, const ParticleArray &particles )
 
     first_call = false;
 }
-

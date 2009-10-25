@@ -29,17 +29,21 @@
 
 ///////////
 // Headers
+#include <fstream>
 #include "Output.h"
 
 
-class TecplotOutput : public Output
+class ByteOutput : public Output
 {
 protected:
+    virtual void printFileHeader();
+    virtual void printFileFooter();
+
     virtual void writeConcentration( bool first_call, double time, const ParticleArray &particles );
     virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles );
     virtual void writeVelocityField( bool first_call, double time );
 public:
-    TecplotOutput( const Vortex3dParam &param, Vortex *the_vortex );
+    ByteOutput( const Vortex3dParam &param, Vortex *the_vortex );
 
-    virtual ~TecplotOutput();
+    virtual ~ByteOutput();
 };

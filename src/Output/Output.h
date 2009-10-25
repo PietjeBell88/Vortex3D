@@ -55,7 +55,7 @@ protected:
 
     Vortex *the_vortex;    // The Vortex (used when emitting velocity field)
 
-    FILE * f;              // Output file.
+    FILE *f;
 
     Vortex3dParam param;   // To output the cmdline options to file when wanted.
 
@@ -72,7 +72,7 @@ protected:
     virtual void writeVelocityField( bool first_call, double time ) = 0;
 
 public:
-    Output( const Vortex3dParam &param, Vortex *the_vortex, FILE * f );
+    Output( const Vortex3dParam &param, Vortex *the_vortex );
 
     virtual ~Output();
 

@@ -42,7 +42,7 @@ protected:
     virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles );
     virtual void writeVelocityField( bool first_call, double time );
 public:
-    PythonOutput( const Vortex3dParam &param, Vortex *the_vortex, FILE * f );
+    PythonOutput( const Vortex3dParam &param, Vortex *the_vortex );
 
     virtual ~PythonOutput();
 };

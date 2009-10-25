@@ -47,6 +47,7 @@
 #include "Output\Output.h"
 #include "Output\PythonOutput.h"
 #include "Output\TecplotOutput.h"
+#include "Output\ByteOutput.h"
 
 #include "Emitter\Emitter.h"
 #include "Emitter\GridEmitter.h"
@@ -163,7 +164,7 @@ int main( int argc, char* argv[] )
 
     ///////////////////////
     // Parse the parameters
-    parse ( argc, argv, &param );
+    parse( argc, argv, &param );
 
     ////////////////////
     // Making the Vortex
@@ -204,14 +205,16 @@ int main( int argc, char* argv[] )
     /////////////////////
     // Making the Output
     Output * outputter;
-    FILE * f = fopen( param.datafile.c_str(), "w" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
 
     switch ( param.outputformat ) {
         case 1:
-            outputter = new PythonOutput( param, the_vortex, f );
+            outputter = new PythonOutput( param, the_vortex );
             break;
         case 2:
-            outputter = new TecplotOutput( param, the_vortex, f );
+            outputter = new TecplotOutput( param, the_vortex );
+            break;
+        case 3:
+            outputter = new ByteOutput( param, the_vortex );
             break;
         default:
             cout << "Unknown outputformat.";
@@ -221,6 +224,7 @@ int main( int argc, char* argv[] )
     // Allocating memory for the array that holds the particles, and initializing (possibly emitting the first particles);
     ParticleArray particles( param.maxparticles );
     the_emitter->init( &particles );
+
 
     //////////////////
     // READY, SET, GO!
@@ -238,11 +242,8 @@ int main( int argc, char* argv[] )
 
     // If outputtype = 3, we're done so we can output and stop.
     if ( param.outputtype == 3 )
-    {
-        fclose( f );
         exit( 0 );
-    }
-
+ 
     // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
     for ( t = 1; t <= max_t; t++ )
     {
@@ -359,7 +360,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         >> Option( 'a', "fl_density", param->fl_density, 1.0 )
         >> Option( 'a', "p_velocity", param->p_velocity, 0.0 )
         >> Option( 'a', "reset_particles", param->reset_particles, 0 )
-        >> Option( 'a', "datafile", param->datafile, "test.txt" )
+        >> Option( 'a', "datafile", param->datafile, "test.data" )
         >> Option( 'a', "outputtype", param->outputtype, 1 )
         >> Option( 'a', "outputformat", param->outputformat, 1 )
         >> Option( 'a', "outputinterval", param->outputinterval, 0.0 )

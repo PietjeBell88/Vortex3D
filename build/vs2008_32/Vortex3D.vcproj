@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Vortex3D"
 	ProjectGUID="{D4423193-7F06-45F2-BD8A-AEFF115699D4}"
 	RootNamespace="Vortex3D"
@@ -365,6 +365,14 @@
 		<Filter
 			Name="Output"
 			>
+			<File
+				RelativePath="..\..\src\Output\ByteOutput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Output\ByteOutput.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\Output\Output.cpp"
 				>
