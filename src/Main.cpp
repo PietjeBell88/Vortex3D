@@ -26,9 +26,8 @@
 
 // TODOLIST
 // TODO: move the equation of motion etc to a seperate class
-// TODO: move parameter parsing checking to seperate function
-// TODO: merge options and param
-// TODO: edit constructors to receive Vortex3dParam, (but keep the class variables, it's so much easier to read and makes it easy to understand what plays a role in that class)
+// TODO: binary output
+// TODO: write a better parameter class
 // TODO: error checks on parameters
 // TODO: Outputting data in HDF5 or whatever
 // TODO: different ways of specifying what the vortex should look like
@@ -158,141 +157,15 @@ inline void writeProgress( int perc )
     fflush( stdout);
 }
 
-
-void show_help()
-{
-    printf(
-            "\nGeneral Options:\n\
-  --help                                         Produce help message.\n\
-  --reset_particles <int> (=0)                   0 = Remove particle when it leaves the box.\n\
-                                                 1 = Reset particle to start position.\n\
-  --datafile <string> (=test.txt)                The path to the output file.\n\
-  --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n\
-                                                 2: Relative concentration.\n\
-                                                 3: Vortex VectorField.\n\
-  --outputformat <int> (=1)                      1: Python\n\
-                                                 2: Tecplot\n\
-                                                 3: Matlab\n\
-  --outputinterval <double> (=0.0)               Fraction of T_l, e.g. 0.1 = emit every 0.1th T_l.\n\
-  --interpolate                                  Use interpolation instead of direct evaluation.\n\
-  --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
-  --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
-  --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n\
-  --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n\
-  --rotategrav                                   Rotate not the vortex but the gravity.\n\
-  --tecplot                                      Print data format for tecplot\n\
-\n\
-Vortex Properties:\
-  --vortextype <int> (=1)                        1: Burgers Vortex, (stretching_r,stretching_z)\n\
-  --radius <double> (=0.1)                       The typical radius of the vortex.\n\
-  --velocity <double> (=0.001)                   Rotational velocity at the radius.\n\
-  --parameters <string> (=)                      Other values the specified vortex might need, seperated by comma (see vortextype).\n\
-  --angle <double> (=0.0)                        Angle of the vortex with the z-axis.\n\
-  --roi <string> (=[-5:101:5,-5:101:5,-5:101:5]) Region of interest, middle value is not used when not using interpolation.\n\
-\n\
-Particle/Emitter Properties:\
-  --emittertype <int> (=1)                       1: Emit the grid specified with --dimensions once.\n\
-                                                 2: Emit continuously from the --dimensions grid.\n\
-                                                 3: Emit continuously and random from the --dimensions grid.\n\
-  --dimensions <string> (=[-4:30:4,0:1:0,4:1:4]) X x Y x Z grid of particles\n\
-                                                 Format: [start_x:steps_x:end_x,\n\
-                                                          start_y:steps_y:end_y,\n\
-                                                          start_z:steps_z:end_z].\n\
-  --p_rate <double> (=100.0)                     Amount of particles emitted per T_l.\n\
-  --p_density <double> (=1000.0)                 Density of the particles (kg/m3).\n\
-  --p_diameter <double> (=5.0E-5)                Diameter of the particles (m).\n\
-  --fl_mu <double> (=1.8e-005)                   Fluid Dynamic Viscocity (Pa s).\n\
-  --fl_density <double> (=1.0)                   Fluid Density (kg/m3).\n\
-  --p_velocity <double> (=0.0)                   Particle's initial velocity (z-direction only) in terms of the terminal velocity.\n\
-  " );
-}
-
 int main( int argc, char* argv[] )
 {
     Vortex3dParam param;
 
-    using GetOpt::GetOpt_pp;
-    using GetOpt::Option;
-    using GetOpt::OptionPresent;
+    ///////////////////////
+    // Parse the parameters
+    parse ( argc, argv, &param );
 
-    GetOpt_pp ops(argc, argv);
-
-    if ( ops >> OptionPresent( 'h', "help" ) )
-    {
-        show_help();
-        exit( 1 );
-    }
-
-    ops >> Option( 'a', "vortextype", param.vortextype, 1 )
-        >> Option( 'a', "radius", param.radius, 0.1 )
-        >> Option( 'a', "velocity", param.velocity, 0.001 )
-        >> Option( 'a', "parameters", param.parameters, "" )
-        >> Option( 'a', "angle", param.angle, 0.0 )
-        >> Option( 'a', "roi", param.roi, "[-5:101:5,-5:101:5,-5:101:5]" )
-        >> Option( 'a', "emittertype", param.emittertype, 1 )
-        >> Option( 'a', "dimensions", param.dimensions, "[-4:30:4,0:1:0,4:1:4]" )
-        >> Option( 'a', "p_rate", param.p_rate, 100.0 )
-        >> Option( 'a', "p_density", param.p_density, 1000.0 )
-        >> Option( 'a', "p_diameter", param.p_diameter, 5E-5 )
-        >> Option( 'a', "fl_mu", param.fl_mu, 18E-6 )
-        >> Option( 'a', "fl_density", param.fl_density, 1.0 )
-        >> Option( 'a', "p_velocity", param.p_velocity, 0.0 )
-        >> Option( 'a', "reset_particles", param.reset_particles, 0 )
-        >> Option( 'a', "datafile", param.datafile, "test.txt" )
-        >> Option( 'a', "outputtype", param.outputtype, 1 )
-        >> Option( 'a', "outputformat", param.outputformat, 1 )
-        >> Option( 'a', "outputinterval", param.outputinterval, 0.0 )
-        >> OptionPresent( 'a', "interpolate", param.interpolate )
-        >> Option( 'a', "duration", param.duration, 1.0 )
-        >> Option( 'a', "maxparticles", param.maxparticles, 1000 )
-        >> Option( 'a', "gravity", param.grav, 1 )
-        >> OptionPresent( 'a', "rotategrav", param.rotategrav )
-        >> Option( 'a', "dtscale", param.dtscale, 0.5 )
-     ;
-
-    //gedoe
-    param.systemtime = param.p_density * param.p_diameter * param.p_diameter / (18 * param.fl_mu);
-
-    // Set the proper gravity.
-    if (!param.rotategrav)
-        param.gravity = Vector3d( 0, 0, -9.81 * param.grav );
-    else
-        param.gravity = Vector3d( 0, sin(param.angle), -cos(param.angle) );
-
-    param.dt = param.dtscale * param.systemtime;
-    param.reset_particles = param.reset_particles;
-    param.beta = param.p_density / param.fl_density; // This ratio is used in the equation of motion
-    param.tau_a = (param.beta + 0.5) / param.beta * param.systemtime;
-    param.datafile = param.datafile;
-    param.outputtype = param.outputtype;
-    param.fl_nu = param.fl_mu / param.fl_density;
-
-    param.p_velocity = (1 - (1 / param.beta)) * param.p_velocity * param.systemtime * -9.81;
-
-    // Read grid+delimiter+deltas for ROI.
-    readGridDelimiterDelta( param.roi, param.radius, &param.roi_grid, &param.roi_delimiter, 
-                            &param.roi_dx, &param.roi_dy, &param.roi_dz );
-    // Read grid+delimiter+deltas for Emitter.
-    readGridDelimiterDelta( param.dimensions, param.radius, &param.emitter_grid, &param.emitter_delimiter, 
-                            &param.emitter_dx, &param.emitter_dy, &param.emitter_dz );
-
-
-    param.p_N = product( param.emitter_grid );
-
-    // Parameter Checking:
-    // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
-    if ( param.outputtype == 3 )
-        param.interpolate = true;
-
-    // In case of the GridEmitters (1 and 2) maxparticles should be at least the size of one grid.
-    if ( param.emittertype == 1 || param.emittertype == 2 )
-    {
-        if ( param.maxparticles < param.p_N )
-            param.maxparticles = param.p_N;
-    }
-
-
-
+    ////////////////////
     // Making the Vortex
     Vortex *the_vortex;
 
@@ -309,10 +182,9 @@ int main( int argc, char* argv[] )
     if ( param.interpolate == true )
         the_vortex->initInterpolate();
 
+    /////////////////////
     // Making the Emitter
-    //GridOnceEmitter tempEmitter(p_density, p_diameter, p_velocity, dimensions, radius, p_rate, reset_particles);
     Emitter *the_emitter;
-
     
     switch ( param.emittertype ) {
         case 1:
@@ -329,7 +201,7 @@ int main( int argc, char* argv[] )
             exit( 1 );
     } 
 
-
+    /////////////////////
     // Making the Output
     Output * outputter;
     FILE * f = fopen( param.datafile.c_str(), "w" ); // C style fprintf's instead of fstream and stuff, because i read somewhere that fprintf is faster
@@ -345,10 +217,12 @@ int main( int argc, char* argv[] )
             cout << "Unknown outputformat.";
     }
 
+    //////////////
     // Allocating memory for the array that holds the particles, and initializing (possibly emitting the first particles);
     ParticleArray particles( param.maxparticles );
     the_emitter->init( &particles );
 
+    //////////////////
     // READY, SET, GO!
     int max_t = static_cast<int>( param.duration * 2 * PI * param.radius / param.velocity / param.dt );
     double interval = param.outputinterval;
@@ -401,6 +275,141 @@ int main( int argc, char* argv[] )
     delete the_emitter;
     delete outputter;
     return 0;
+}
+
+////////
+// Help 
+void show_help()
+{
+    printf(
+            "\nGeneral Options:\n\
+  --help                                         Produce help message.\n\
+  --reset_particles <int> (=0)                   0 = Remove particle when it leaves the box.\n\
+                                                 1 = Reset particle to start position.\n\
+  --datafile <string> (=test.txt)                The path to the output file.\n\
+  --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n\
+                                                 2: Relative concentration.\n\
+                                                 3: Vortex VectorField.\n\
+  --outputformat <int> (=1)                      1: Python\n\
+                                                 2: Tecplot\n\
+                                                 3: Matlab\n\
+  --outputinterval <double> (=0.0)               Fraction of T_l, e.g. 0.1 = emit every 0.1th T_l.\n\
+  --interpolate                                  Use interpolation instead of direct evaluation.\n\
+  --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
+  --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
+  --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n\
+  --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n\
+  --rotategrav                                   Rotate not the vortex but the gravity.\n\
+  --tecplot                                      Print data format for tecplot\n\
+\n\
+Vortex Properties:\
+  --vortextype <int> (=1)                        1: Burgers Vortex, (stretching_r,stretching_z)\n\
+  --radius <double> (=0.1)                       The typical radius of the vortex.\n\
+  --velocity <double> (=0.001)                   Rotational velocity at the radius.\n\
+  --parameters <string> (=)                      Other values the specified vortex might need, seperated by comma (see vortextype).\n\
+  --angle <double> (=0.0)                        Angle of the vortex with the z-axis.\n\
+  --roi <string> (=[-5:101:5,-5:101:5,-5:101:5]) Region of interest, middle value is not used when not using interpolation.\n\
+\n\
+Particle/Emitter Properties:\
+  --emittertype <int> (=1)                       1: Emit the grid specified with --dimensions once.\n\
+                                                 2: Emit continuously from the --dimensions grid.\n\
+                                                 3: Emit continuously and random from the --dimensions grid.\n\
+  --dimensions <string> (=[-4:30:4,0:1:0,4:1:4]) X x Y x Z grid of particles\n\
+                                                 Format: [start_x:steps_x:end_x,\n\
+                                                          start_y:steps_y:end_y,\n\
+                                                          start_z:steps_z:end_z].\n\
+  --p_rate <double> (=100.0)                     Amount of particles emitted per T_l.\n\
+  --p_density <double> (=1000.0)                 Density of the particles (kg/m3).\n\
+  --p_diameter <double> (=5.0E-5)                Diameter of the particles (m).\n\
+  --fl_mu <double> (=1.8e-005)                   Fluid Dynamic Viscocity (Pa s).\n\
+  --fl_density <double> (=1.0)                   Fluid Density (kg/m3).\n\
+  --p_velocity <double> (=0.0)                   Particle's initial velocity (z-direction only) in terms of the terminal velocity.\n\
+  " );
+}
+
+
+/////////////////////
+// Parse commandline 
+void parse( int argc, char* argv[], Vortex3dParam *param ) {
+    
+    using GetOpt::GetOpt_pp;
+    using GetOpt::Option;
+    using GetOpt::OptionPresent;
+
+    GetOpt_pp ops(argc, argv);
+
+    if ( ops >> OptionPresent( 'h', "help" ) )
+    {
+        show_help();
+        exit( 1 );
+    }
+
+    ops >> Option( 'a', "vortextype", param->vortextype, 1 )
+        >> Option( 'a', "radius", param->radius, 0.1 )
+        >> Option( 'a', "velocity", param->velocity, 0.001 )
+        >> Option( 'a', "parameters", param->parameters, "" )
+        >> Option( 'a', "angle", param->angle, 0.0 )
+        >> Option( 'a', "roi", param->roi, "[-5:101:5,-5:101:5,-5:101:5]" )
+        >> Option( 'a', "emittertype", param->emittertype, 1 )
+        >> Option( 'a', "dimensions", param->dimensions, "[-4:30:4,0:1:0,4:1:4]" )
+        >> Option( 'a', "p_rate", param->p_rate, 100.0 )
+        >> Option( 'a', "p_density", param->p_density, 1000.0 )
+        >> Option( 'a', "p_diameter", param->p_diameter, 5E-5 )
+        >> Option( 'a', "fl_mu", param->fl_mu, 18E-6 )
+        >> Option( 'a', "fl_density", param->fl_density, 1.0 )
+        >> Option( 'a', "p_velocity", param->p_velocity, 0.0 )
+        >> Option( 'a', "reset_particles", param->reset_particles, 0 )
+        >> Option( 'a', "datafile", param->datafile, "test.txt" )
+        >> Option( 'a', "outputtype", param->outputtype, 1 )
+        >> Option( 'a', "outputformat", param->outputformat, 1 )
+        >> Option( 'a', "outputinterval", param->outputinterval, 0.0 )
+        >> OptionPresent( 'a', "interpolate", param->interpolate )
+        >> Option( 'a', "duration", param->duration, 1.0 )
+        >> Option( 'a', "maxparticles", param->maxparticles, 1000 )
+        >> Option( 'a', "gravity", param->grav, 1 )
+        >> OptionPresent( 'a', "rotategrav", param->rotategrav )
+        >> Option( 'a', "dtscale", param->dtscale, 0.5 )
+     ;
+    //////////////////////////////////////
+    // Do some checking on the parameters
+    
+    // Gravity (depends on whether you rotate the gravity or the vortex)
+    if (!param->rotategrav)
+        param->gravity = Vector3d( 0, 0, -9.81 * param->grav );
+    else
+        param->gravity = Vector3d( 0, sin(param->angle), -cos(param->angle) );
+    
+    // Read grid+delimiter+deltas for ROI.
+    readGridDelimiterDelta( param->roi, param->radius, &param->roi_grid, &param->roi_delimiter, 
+                            &param->roi_dx, &param->roi_dy, &param->roi_dz );
+    // Read grid+delimiter+deltas for Emitter.
+    readGridDelimiterDelta( param->dimensions, param->radius, &param->emitter_grid, &param->emitter_delimiter, 
+                            &param->emitter_dx, &param->emitter_dy, &param->emitter_dz );
+
+    // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
+    if ( param->outputtype == 3 )
+        param->interpolate = true;
+
+    // In case of the GridEmitters (1 and 2) maxparticles should be at least the size of one grid.
+    if ( param->emittertype == 1 || param->emittertype == 2 )
+    {
+        if ( param->maxparticles < param->p_N )
+            param->maxparticles = param->p_N;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Calculate some extra parameters from the cmdline ones
+    param->fl_nu = param->fl_mu / param->fl_density;
+    param->beta = param->p_density / param->fl_density; 
+
+    param->systemtime = param->p_density * param->p_diameter * param->p_diameter / (18 * param->fl_mu);
+    param->tau_a = (param->beta + 0.5) / param->beta * param->systemtime;
+
+    param->dt = param->dtscale * param->systemtime;
+    
+    param->p_velocity = (1 - (1 / param->beta)) * param->p_velocity * param->systemtime * -9.81;
+
+    param->p_N = product( param->emitter_grid );
 }
 
 

@@ -77,8 +77,7 @@ struct Vortex3dParam {
 
 /////////////
 // Functions
-void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
-                             TDelimiter *delimiter, double *dx, double *dy, double *dz );
+
 
 void getConcentration( const ParticleArray &particles, const Vortex3dParam &param,
                        ScalarField *concentration );
@@ -90,4 +89,11 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
                      double *average_fall_time, double *particles_out );
 
 inline void writeProgress( int perc );
+
+void show_help();
+
+void parse( int argc, char* argv[], Vortex3dParam *param );
+
+void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
+                             TDelimiter *delimiter, double *dx, double *dy, double *dz );
 
