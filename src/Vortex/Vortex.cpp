@@ -54,8 +54,8 @@ Vortex::Vortex( const Vortex3dParam &param )
     this->grid = param.roi_grid;
     this->delimiter = param.roi_delimiter;
     this->dx = param.roi_dx;
-    this->dx = param.roi_dy;
-    this->dx = param.roi_dz;
+    this->dy = param.roi_dy;
+    this->dz = param.roi_dz;
 }
 
 

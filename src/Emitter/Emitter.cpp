@@ -41,12 +41,12 @@ Emitter::Emitter( const Vortex3dParam &param )
     this->p_density = param.p_density;
     this->p_diameter = param.p_diameter;
     this->p_velocity = param.p_velocity;
-
+    
     this->grid = param.emitter_grid;
     this->delimiter = param.emitter_delimiter;
     this->dx = param.emitter_dx;
-    this->dx = param.emitter_dy;
-    this->dx = param.emitter_dz;
+    this->dy = param.emitter_dy;
+    this->dz = param.emitter_dz;
     this->p_N = param.p_N;
 
     this->p_rate = param.p_rate;
