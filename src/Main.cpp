@@ -432,8 +432,8 @@ void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid 
     *grid = X, Y, Z;
 
     // Readability:
-    TDelimiter _delimiter = *delimiter;
-    TGrid _grid = *grid;
+    const TDelimiter & _delimiter = *delimiter;
+    const TGrid & _grid = *grid;
 
     // Set dx/dy/dz, and do some checks on them.
     *dx = ( _delimiter(0, 1) - _delimiter(0, 0) ) / ( _grid(0) - 1 );
