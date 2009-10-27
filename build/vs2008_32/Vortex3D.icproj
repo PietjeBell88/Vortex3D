@@ -12,8 +12,8 @@
 			<Tool
 				Name="CppCmplrTool"
 				GlobalOptimizations="true"
-				UseProcessorExtensions="6"
-				Parallelization="true"
+				UseProcessorExtensions="1"
+				Parallelization="false"
 				C99Support="true"
 				ProfileGuidedOptimization="0"/>
 		</Configuration>
@@ -26,6 +26,7 @@
 				EnableEnhancedInstructionSet="1000"
 				GenerateAlternateCodePaths="0"
 				UseProcessorExtensions="6"
+				Parallelization="true"
 				C99Support="true"/>
 		</Configuration>
 	</Configurations>

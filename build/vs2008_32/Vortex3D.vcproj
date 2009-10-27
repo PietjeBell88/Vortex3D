@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Vortex3D"
 	ProjectGUID="{D4423193-7F06-45F2-BD8A-AEFF115699D4}"
 	RootNamespace="Vortex3D"
@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -120,7 +120,7 @@
 				FavorSizeOrSpeed="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				ExceptionHandling="1"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				OpenMP="false"
 				UsePrecompiledHeader="0"
@@ -139,6 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -200,7 +201,7 @@
 				FavorSizeOrSpeed="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				ExceptionHandling="1"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				StructMemberAlignment="0"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="0"
@@ -220,6 +221,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
