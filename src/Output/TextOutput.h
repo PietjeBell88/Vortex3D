@@ -32,7 +32,7 @@
 #include "Output.h"
 
 
-class PythonOutput : public Output
+class TextOutput : public Output
 {
 protected:
     virtual void printFileHeader();
@@ -42,7 +42,7 @@ protected:
     virtual void writeTrajectories( bool first_call, double time, const ParticleArray &particles );
     virtual void writeVelocityField( bool first_call, double time );
 public:
-    PythonOutput( const Vortex3dParam &param, Vortex *the_vortex );
+    TextOutput( const Vortex3dParam &param, Vortex *the_vortex );
 
-    virtual ~PythonOutput();
+    virtual ~TextOutput();
 };

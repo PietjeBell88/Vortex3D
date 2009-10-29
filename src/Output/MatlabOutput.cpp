@@ -27,7 +27,7 @@
 
 ///////////
 // Headers
-#include "ByteOutput.h"
+#include "MatlabOutput.h"
 
 #include "../Main.h" 
 #include "../ParticleArray.h" 
@@ -37,7 +37,7 @@
 
 ///////////////
 // Constructor
-ByteOutput::ByteOutput( const Vortex3dParam &param, Vortex *the_vortex ) : 
+MatlabOutput::MatlabOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
                           Output( param, the_vortex ) 
 {
     f = fopen( param.datafile.c_str(), "wb" );
@@ -45,21 +45,21 @@ ByteOutput::ByteOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
 
 //////////////
 // Destructor
-ByteOutput::~ByteOutput() 
+MatlabOutput::~MatlabOutput()
 {
     fclose( f );
 }
 
 
-void ByteOutput::printFileHeader() { 
+void MatlabOutput::printFileHeader() {
 }
 
-void ByteOutput::printFileFooter() { 
+void MatlabOutput::printFileFooter() {
 }
 
 
 // Trajectories
-inline void ByteOutput::writeTrajectories( bool first_call, double time, const ParticleArray &particles )
+inline void MatlabOutput::writeTrajectories( bool first_call, double time, const ParticleArray &particles )
 {
     if ( first_call )
     {
@@ -85,7 +85,7 @@ inline void ByteOutput::writeTrajectories( bool first_call, double time, const P
 }
 
 // Concentration
-inline void ByteOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
+inline void MatlabOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
 {
     ScalarField concentration( grid(0), grid(1), grid(2) );
     getConcentration( particles, &concentration );
@@ -107,7 +107,7 @@ inline void ByteOutput::writeConcentration( bool first_call, double time, const 
 }
 
 // Velocity Field
-inline void ByteOutput::writeVelocityField( bool first_call, double time )
+inline void MatlabOutput::writeVelocityField( bool first_call, double time )
 {
     const VectorField &v = the_vortex->getVectorField();
 
@@ -119,13 +119,13 @@ inline void ByteOutput::writeVelocityField( bool first_call, double time )
     fwrite( buf, 8, 10, f );
 
     // Write the velocity values to file.
-    for ( int i = 0; i < grid(0); i++ )
+    for ( int i = 0; i < grid(2); i++ )
     {
-        for ( int j = 0; j < grid(1); j++ )
+        for ( int j = 0; j < grid(0); j++ )
         {
-            for ( int k = 0; k < grid(2); k++ )
+            for ( int k = 0; k < grid(1); k++ )
             {
-                const Vector3d &vel = v(i, j, k);
+                const Vector3d &vel = v(j, k, i);
                 double buf[] = { vel(0), vel(1), vel(2) };
                 fwrite( buf, 8, 3, f ); 
             }

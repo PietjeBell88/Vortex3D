@@ -27,7 +27,7 @@
 
 ///////////
 // Headers
-#include "PythonOutput.h"
+#include "TextOutput.h"
 
 #include "../Main.h" 
 #include "../ParticleArray.h" 
@@ -37,7 +37,7 @@
 
 ///////////////
 // Constructor
-PythonOutput::PythonOutput( const Vortex3dParam &param, Vortex *the_vortex ) : 
+TextOutput::TextOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
                           Output( param, the_vortex ) 
 {
     f = fopen( param.datafile.c_str(), "w" );
@@ -45,13 +45,13 @@ PythonOutput::PythonOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
 
 //////////////
 // Destructor
-PythonOutput::~PythonOutput() 
+TextOutput::~TextOutput()
 {
     fclose(f);
 }
 
 
-void PythonOutput::printFileHeader() { 
+void TextOutput::printFileHeader() {
     fprintf(
              f,
              "#Settings: vortextype %d, radius %e, velocity %e, parameters \"%s\" \
@@ -66,12 +66,12 @@ void PythonOutput::printFileHeader() {
              param.interpolate, param.duration, param.maxparticles, param.grav );
 }
 
-void PythonOutput::printFileFooter() { 
+void TextOutput::printFileFooter() {
 }
 
 
 // Trajectories
-inline void PythonOutput::writeTrajectories( bool first_call, double time, const ParticleArray &particles )
+inline void TextOutput::writeTrajectories( bool first_call, double time, const ParticleArray &particles )
 {
     if ( first_call )
         fprintf( f, "#T     N     X     Y     Z     Speed\n" );
@@ -91,7 +91,7 @@ inline void PythonOutput::writeTrajectories( bool first_call, double time, const
 }
 
 // Concentration
-inline void PythonOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
+inline void TextOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
 {
     if ( first_call )
         fprintf( f, "#T     X     Y     Z     C\n" );
@@ -117,7 +117,7 @@ inline void PythonOutput::writeConcentration( bool first_call, double time, cons
 }
 
 // Velocity Field
-inline void PythonOutput::writeVelocityField( bool first_call, double time )
+inline void TextOutput::writeVelocityField( bool first_call, double time )
 {
     fprintf( f, "#T     X     Y     Z     UX     UY     UZ\n" );
 

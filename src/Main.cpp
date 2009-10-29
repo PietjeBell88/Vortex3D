@@ -45,9 +45,10 @@
 #include "Vortex\BurgersVortex.h"
 
 #include "Output\Output.h"
-#include "Output\PythonOutput.h"
-#include "Output\TecplotOutput.h"
 #include "Output\ByteOutput.h"
+#include "Output\MatlabOutput.h"
+#include "Output\TextOutput.h"
+#include "Output\TecplotOutput.h"
 
 #include "Emitter\Emitter.h"
 #include "Emitter\GridEmitter.h"
@@ -208,13 +209,16 @@ int main( int argc, char* argv[] )
 
     switch ( param.outputformat ) {
         case 1:
-            outputter = new PythonOutput( param, the_vortex );
+            outputter = new ByteOutput( param, the_vortex );
             break;
         case 2:
-            outputter = new TecplotOutput( param, the_vortex );
+            outputter = new MatlabOutput( param, the_vortex );
             break;
         case 3:
-            outputter = new ByteOutput( param, the_vortex );
+            outputter = new TextOutput( param, the_vortex );
+            break;
+        case 4:
+            outputter = new TecplotOutput( param, the_vortex );
             break;
         default:
             cout << "Unknown outputformat.";
@@ -291,9 +295,10 @@ void show_help()
   --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n\
                                                  2: Relative concentration.\n\
                                                  3: Vortex VectorField.\n\
-  --outputformat <int> (=1)                      1: Python\n\
-                                                 2: Tecplot\n\
-                                                 3: Matlab\n\
+  --outputformat <int> (=1)                      1: Byte\n\
+                                                 2: Matlab\n\
+                                                 3: Text\n\
+                                                 4: Tecplot\n\
   --outputinterval <double> (=0.0)               Fraction of T_l, e.g. 0.1 = emit every 0.1th T_l.\n\
   --interpolate                                  Use interpolation instead of direct evaluation.\n\
   --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
