@@ -49,13 +49,14 @@ class ParticleArray;
 // Global Settings
 struct Vortex3dParam {
     // Cmdline parameters
-    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat;
+    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat, outputinterval;
     double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
-           duration, p_velocity, outputinterval, dtscale, p_rate;
+           duration, p_velocity, dtscale, p_rate;
     bool interpolate, rotategrav;
     string parameters, roi, dimensions, datafile;
 
     // Calculated parameters
+    int max_t;
     double fl_nu;
     double systemtime;
     Vector3d gravity;

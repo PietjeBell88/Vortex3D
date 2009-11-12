@@ -232,8 +232,6 @@ int main( int argc, char* argv[] )
 
     //////////////////
     // READY, SET, GO!
-    int max_t = static_cast<int>( param.duration * 2 * PI * param.radius / param.velocity / param.dt );
-    double interval = param.outputinterval;
 
     // Needed to calculate the average fall time.
     double average_fall_time = 0;
@@ -249,12 +247,12 @@ int main( int argc, char* argv[] )
         exit( 0 );
  
     // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
-    for ( t = 1; t <= max_t; t++ )
+    for ( t = 1; t <= param.max_t; t++ )
     {
-        double relative_time = t * param.duration / max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
-        double time = (t * param.dt) / max_t; // Absolute time in seconds.
+        double relative_time = t * param.duration / param.max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
+        double time = (t * param.dt) / param.max_t; // Absolute time in seconds.
 
-        writeProgress( (t * 100) / max_t ); // Display progress on stdout, e.g. [45%]
+        writeProgress( (t * 100) / param.max_t ); // Display progress on stdout, e.g. [45%]
 
         // Move the particles
         moveParticles( the_vortex, the_emitter, &particles, param );
@@ -262,11 +260,8 @@ int main( int argc, char* argv[] )
                 &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
 
         // Write to file
-        if ( relative_time > interval )
-        {
+        if ( t % param.outputinterval == 0 )
             outputter->writeToFile( time, particles );
-            interval += param.outputinterval;
-        }
 
         the_emitter->update( relative_time, &particles );
 
@@ -299,7 +294,7 @@ void show_help()
                                                  2: Matlab\n\
                                                  3: Text\n\
                                                  4: Tecplot\n\
-  --outputinterval <double> (=0.0)               Fraction of T_l, e.g. 0.1 = emit every 0.1th T_l.\n\
+  --outputinterval <int> (=1)                    Write every <n> cycles. (default is write every cycle)\n\
   --interpolate                                  Use interpolation instead of direct evaluation.\n\
   --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
   --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
@@ -368,7 +363,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         >> Option( 'a', "datafile", param->datafile, "test.data" )
         >> Option( 'a', "outputtype", param->outputtype, 1 )
         >> Option( 'a', "outputformat", param->outputformat, 1 )
-        >> Option( 'a', "outputinterval", param->outputinterval, 0.0 )
+        >> Option( 'a', "outputinterval", param->outputinterval, 1 )
         >> OptionPresent( 'a', "interpolate", param->interpolate )
         >> Option( 'a', "duration", param->duration, 1.0 )
         >> Option( 'a', "maxparticles", param->maxparticles, 1000 )
@@ -379,6 +374,10 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     //////////////////////////////////////
     // Do some checking on the parameters
     
+    // Can't output more data than we have:
+    if ( param->outputinterval < 1 )
+        param->outputinterval = 1;
+
     // Gravity (depends on whether you rotate the gravity or the vortex)
     if (!param->rotategrav)
         param->gravity = Vector3d( 0, 0, -9.81 * param->grav );
@@ -416,8 +415,9 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     param->p_velocity = (1 - (1 / param->beta)) * param->p_velocity * param->systemtime * -9.81;
 
     param->p_N = product( param->emitter_grid );
-}
 
+    param->max_t = (int) ( param->duration * 2 * PI * param->radius / param->velocity / param->dt );
+}
 
 ///////////////////////////
 // Parse formatted strings
