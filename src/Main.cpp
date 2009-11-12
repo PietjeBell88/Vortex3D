@@ -408,7 +408,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     param->fl_nu = param->fl_mu / param->fl_density;
     param->beta = param->p_density / param->fl_density; 
 
-    param->systemtime = param->p_density * param->p_diameter * param->p_diameter / (18 * param->fl_mu);
+    param->systemtime = param->p_density * param->p_diameter * param->p_diameter / (18 * param->fl_nu);
     param->tau_a = (param->beta + 0.5) / param->beta * param->systemtime;
 
     param->dt = param->dtscale * param->systemtime;
