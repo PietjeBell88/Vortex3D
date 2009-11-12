@@ -63,6 +63,7 @@ struct Vortex3dParam {
     double dt;
     double beta; // This ratio is used in the equation of motion
     double tau_a;
+    double terminal_velocity;
 
     // Emitter
     TGrid emitter_grid;
@@ -97,4 +98,6 @@ void parse( int argc, char* argv[], Vortex3dParam *param );
 
 void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
                              TDelimiter *delimiter, double *dx, double *dy, double *dz );
+
+void printParam( const Vortex3dParam &param );
 

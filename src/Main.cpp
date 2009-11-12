@@ -166,6 +166,7 @@ int main( int argc, char* argv[] )
     ///////////////////////
     // Parse the parameters
     parse( argc, argv, &param );
+    printParam( param );
 
     ////////////////////
     // Making the Vortex
@@ -415,7 +416,8 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
 
     param->dt = param->dtscale * param->systemtime;
     
-    param->p_velocity = (1 - (1 / param->beta)) * param->p_velocity * param->systemtime * -9.81;
+    param->terminal_velocity = (1 - (1 / param->beta)) * param->systemtime * -9.81;
+    param->p_velocity = param->p_velocity * param->terminal_velocity;
 
     param->max_t = (int) ( param->duration * 2 * PI * param->radius / param->velocity / param->dt );
 }
@@ -454,4 +456,13 @@ void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid 
 
     if ( _grid(2) <= 1 )
         *dz = 0;
+}
+
+void printParam( const Vortex3dParam &param )
+{
+    printf( "System Time (tau_p): %.5g\n", param.systemtime );
+    printf( "System Time (tau_a): %.5g\n", param.tau_a );
+    printf( "Maximum time:        %.5g\n", param.max_t * param.dt );
+    printf( "Timestep size (dt):  %.5g\n", param.dt );
+    printf( "Amount of timesteps: %d\n",   param.max_t );
 }
