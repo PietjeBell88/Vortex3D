@@ -49,9 +49,9 @@ class ParticleArray;
 // Global Settings
 struct Vortex3dParam {
     // Cmdline parameters
-    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat, outputinterval;
+    int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat, outputintervalmethod;
     double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
-           duration, p_velocity, dtscale, p_rate;
+           duration, p_velocity, dtscale, p_rate, outputinterval;
     bool interpolate, rotategrav;
     string parameters, roi, dimensions, datafile;
 
@@ -64,6 +64,7 @@ struct Vortex3dParam {
     double beta; // This ratio is used in the equation of motion
     double tau_a;
     double terminal_velocity;
+    double v_ref;
 
     // Emitter
     TGrid emitter_grid;

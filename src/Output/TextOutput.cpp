@@ -57,7 +57,7 @@ void TextOutput::printFileHeader() {
              "#Settings: vortextype %d, radius %e, velocity %e, parameters \"%s\" \
              , angle %e, roi \"%s\", emittertype %d, dimensions \"%s\", p_rate %e \
              , p_density %e, p_diameter %e, fl_mu %e, fl_density %e, p_velocity %e \
-             , reset_particles %d, datafile \"%s\", outputtype %d, outputinterval %d \
+             , reset_particles %d, datafile \"%s\", outputtype %d, outputinterval %e \
              , interpolate %d, duration %e, maxparticles %d, gravity %d\n",
              param.vortextype, param.radius, param.velocity, param.parameters.c_str(),
              param.angle, param.roi.c_str(), param.emittertype, param.dimensions.c_str(), param.p_rate,

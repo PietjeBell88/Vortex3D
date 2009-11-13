@@ -46,6 +46,8 @@ Output::Output( const Vortex3dParam &param, Vortex *the_vortex )
     this->dx = param.roi_dx;
     this->dy = param.roi_dy;
     this->dz = param.roi_dz;
+    
+    this->timestep = param.outputinterval;
 
     this->the_vortex = the_vortex;
 

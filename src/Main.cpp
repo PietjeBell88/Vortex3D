@@ -247,6 +247,8 @@ int main( int argc, char* argv[] )
     if ( param.outputtype == 3 )
         exit( 0 );
  
+    double time_next_output = param.outputinterval;
+
     // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
     for ( t = 1; t <= param.max_t; t++ )
     {
@@ -261,8 +263,11 @@ int main( int argc, char* argv[] )
                 &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
 
         // Write to file
-        if ( t % param.outputinterval == 0 )
+        if ( relative_time >= time_next_output )
+        {
             outputter->writeToFile( time, particles );
+            time_next_output += param.outputinterval;
+        }
 
         the_emitter->update( relative_time, &particles );
 
@@ -295,14 +300,16 @@ void show_help()
                                                  2: Matlab\n\
                                                  3: Text\n\
                                                  4: Tecplot\n\
-  --outputinterval <int> (=1)                    Write every <n> cycles. (default is write every cycle)\n\
+  --outputinterval <double> (=1.0)               Write every <n cycles | relative_time>.\n\
+  --outputintervalmode <int> (=1)                Change behavior of outputinterval.\n\
+                                                 1: every n cycles\n\
+                                                 2: every relative_time\n\
   --interpolate                                  Use interpolation instead of direct evaluation.\n\
   --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
   --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
   --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n\
   --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n\
   --rotategrav                                   Rotate not the vortex but the gravity.\n\
-  --tecplot                                      Print data format for tecplot\n\
 \n\
 Vortex Properties:\
   --vortextype <int> (=1)                        1: Burgers Vortex, (stretching_r,stretching_z)\n\
@@ -346,6 +353,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         exit( 1 );
     }
 
+    // Parse the cmdline
     ops >> Option( 'a', "vortextype", param->vortextype, 1 )
         >> Option( 'a', "radius", param->radius, 0.1 )
         >> Option( 'a', "velocity", param->velocity, 0.001 )
@@ -364,7 +372,8 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         >> Option( 'a', "datafile", param->datafile, "test.data" )
         >> Option( 'a', "outputtype", param->outputtype, 1 )
         >> Option( 'a', "outputformat", param->outputformat, 1 )
-        >> Option( 'a', "outputinterval", param->outputinterval, 1 )
+        >> Option( 'a', "outputinterval", param->outputinterval, 1.0 )
+        >> Option( 'a', "outputintervalmethod", param->outputintervalmethod, 1 )
         >> OptionPresent( 'a', "interpolate", param->interpolate )
         >> Option( 'a', "duration", param->duration, 1.0 )
         >> Option( 'a', "maxparticles", param->maxparticles, 1000 )
@@ -375,10 +384,6 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     //////////////////////////////////////
     // Do some checking on the parameters
     
-    // Can't output more data than we have:
-    if ( param->outputinterval < 1 )
-        param->outputinterval = 1;
-
     // Gravity (depends on whether you rotate the gravity or the vortex)
     if (!param->rotategrav)
         param->gravity = Vector3d( 0, 0, -9.81 * param->grav );
@@ -416,10 +421,43 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
 
     param->dt = param->dtscale * param->systemtime;
     
+    param->v_ref = 2 * PI * param->radius / param->velocity;
+
     param->terminal_velocity = (1 - (1 / param->beta)) * param->systemtime * -9.81;
     param->p_velocity = param->p_velocity * param->terminal_velocity;
 
-    param->max_t = (int) ( param->duration * 2 * PI * param->radius / param->velocity / param->dt );
+    param->max_t = (int) ( param->duration * param->v_ref / param->dt );
+
+    /////////////////////////////////////////////////////////////
+    // And some more checking?
+
+    // Can't output more data than we have:
+    if ( param->outputintervalmethod == 1 )
+    {
+        if ( param->outputinterval < 1 )
+            printf( "Error: outputinterval should be >= 1 on intervalmode 1." );
+
+        param->outputinterval = param->outputinterval * param->dt / param->v_ref;
+    }
+    else if ( param->outputintervalmethod == 2 )
+    {
+        if ( param->outputinterval <= 0 )
+            param->outputinterval = 0;
+        
+        // If the absolute time between outputs is smaller than dt (the iteration) 
+        // exit with error.
+        if ( param->outputinterval * param->v_ref / param->dt < 1 ) 
+        {
+            printf( "Error: outputcycle is smaller than 1: %g.\n"     
+                    "       Please lower dtscale to accomodate.\n", param->outputinterval * param->v_ref / param->dt );
+            exit(1);
+        }
+    }
+    else
+    {
+        printf( "Unknown outputintervalmethod: %d\n", param->outputintervalmethod );
+        exit(1);
+    }
 }
 
 ///////////////////////////

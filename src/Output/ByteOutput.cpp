@@ -63,7 +63,7 @@ inline void ByteOutput::writeTrajectories( bool first_call, double time, const P
 {
     if ( first_call )
     {
-        // Write the and delimiterd values to file.
+        // Write the and delimiter values to file.
         // i.e. buf[] = { xmin, xmax, ymin, ymax, zmin, zmax }
         double buf[] = { delimiter(0, 0), delimiter(0, 1),
                          delimiter(1, 0), delimiter(1, 1),
@@ -87,23 +87,32 @@ inline void ByteOutput::writeTrajectories( bool first_call, double time, const P
 // Concentration
 inline void ByteOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
 {
+    if ( first_call )
+    {
+        // Write the time, and delimiter/grid values to file.
+        // i.e. buf[] = { xmin, xstep, xmax, ymin, ystep, ymax, zmin, zstep, zmax, time }
+        double buf[] = { delimiter(0, 0), grid(0), delimiter(0, 1), 
+                         delimiter(1, 0), grid(1), delimiter(1, 1), 
+                         delimiter(2, 0), grid(2), delimiter(2, 1), 
+                         timestep };
+        fwrite( buf, 8, 10, f );
+    }
+
     ScalarField concentration( grid(0), grid(1), grid(2) );
     getConcentration( particles, &concentration );
 
     for ( int i = 0; i < grid(0); i++ )
     {
-        double x = delimiter(0, 0) + i * dx;
         for ( int j = 0; j < grid(1); j++ )
         {
-            double y = delimiter(1, 0) + j * dy;
             for ( int k = 0; k < grid(2); k++ )
             {
-                double z = delimiter(2, 0) + k * dz;
-                double buf[] = { time, x, y, z, concentration(i,j,k) };
-                fwrite( buf, 8, 5, f);
+                double buf[] = { concentration(i,j,k) };
+                fwrite( buf, 8, 1, f);
             }
         }
     }
+
 }
 
 // Velocity Field
@@ -114,8 +123,8 @@ inline void ByteOutput::writeVelocityField( bool first_call, double time )
     // Write the time, and delimiter/grid values to file.
     // i.e. buf[] = { time, xmin, xstep, xmax, ymin, ystep, ymax, zmin, zstep, zmax }
     double buf[] = { time, delimiter(0, 0), grid(0), delimiter(0, 1), 
-                    delimiter(1, 0), grid(1), delimiter(1, 1), 
-                    delimiter(2, 0), grid(2), delimiter(2, 1) };
+                           delimiter(1, 0), grid(1), delimiter(1, 1), 
+                           delimiter(2, 0), grid(2), delimiter(2, 1) };
     fwrite( buf, 8, 10, f );
 
     // Write the velocity values to file.

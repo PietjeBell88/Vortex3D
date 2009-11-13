@@ -52,6 +52,7 @@ protected:
     TGrid grid;            // X x Y x Z grid of resolution
     TDelimiter delimiter;  // Offsets
     double dx, dy, dz;     // deltas
+    double timestep;       // Output interval in relative time.
 
     Vortex *the_vortex;    // The Vortex (used when emitting velocity field)
 
