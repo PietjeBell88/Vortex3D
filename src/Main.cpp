@@ -391,6 +391,9 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     readGridDelimiterDelta( param->dimensions, param->radius, &param->emitter_grid, &param->emitter_delimiter, 
                             &param->emitter_dx, &param->emitter_dy, &param->emitter_dz );
 
+    // Calculate the amount of particles in one grid.
+    param->p_N = product( param->emitter_grid );
+
     // If the outputtype is 3, you want the vortex velocity field. Therefore, interpolate should be 1
     if ( param->outputtype == 3 )
         param->interpolate = true;
@@ -413,8 +416,6 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     param->dt = param->dtscale * param->systemtime;
     
     param->p_velocity = (1 - (1 / param->beta)) * param->p_velocity * param->systemtime * -9.81;
-
-    param->p_N = product( param->emitter_grid );
 
     param->max_t = (int) ( param->duration * 2 * PI * param->radius / param->velocity / param->dt );
 }
