@@ -62,13 +62,11 @@ Emitter::~Emitter() {}
 
 /////////
 // Reset
-double Emitter::reset( int p, double relative_time, ParticleArray *particles )
+void Emitter::reset( int p, double relative_time, ParticleArray *particles )
 {
     // This is a default reset() function which probably will not have to be overrided.
     Particle removed = particles->remove( p );
 
     if ( reset_particles != 0 )
         particles->add( startPos( p ), startVel( p ), relative_time );
-
-    return (relative_time - removed.spawnTime());
 }

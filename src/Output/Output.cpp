@@ -60,9 +60,10 @@ Output::Output( const Vortex3dParam &param, Vortex *the_vortex )
 Output::~Output() {}
 
 
-void Output::getConcentration( const ParticleArray &particles, ScalarField *concentration )
+ScalarField Output::getConcentration( const ParticleArray &particles )
 {
-    *concentration = 0;
+    ScalarField concentration( grid(0), grid(1), grid(2) );
+    concentration = 0.;
 
     // Readability. Hopefully optimized away.
     const int & length = particles.getLength();
@@ -76,11 +77,13 @@ void Output::getConcentration( const ParticleArray &particles, ScalarField *conc
         int j = static_cast<int> (floor((pos(1) - delimiter(1, 0)) / dy));
         int k = static_cast<int> (floor((pos(2) - delimiter(2, 0)) / dz));
 
-        ++(*concentration)(i, j, k);
+        ++(concentration)(i, j, k);
     }
 
-    if ( sum( *concentration ) != 0 )
-        *concentration = (*concentration) / sum( *concentration );
+    if ( sum( concentration ) != 0 )
+        concentration = (concentration) / sum( concentration );
+
+    return concentration;
 }
 
 //

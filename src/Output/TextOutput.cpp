@@ -96,8 +96,7 @@ inline void TextOutput::writeConcentration( bool first_call, double time, const 
     if ( first_call )
         fprintf( f, "#T     X     Y     Z     C\n" );
 
-    ScalarField concentration( grid(0), grid(1), grid(2) );
-    getConcentration( particles, &concentration );
+    ScalarField &concentration = getConcentration( particles );
 
     for ( int i = 0; i < grid(0); i++ )
     {

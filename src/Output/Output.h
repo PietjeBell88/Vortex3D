@@ -63,8 +63,6 @@ protected:
 
     /////////////
     // Functions
-    void getConcentration( const ParticleArray &particles, ScalarField *concentration );
-
     virtual void printFileHeader();
     virtual void printFileFooter();
 
@@ -78,4 +76,6 @@ public:
     virtual ~Output();
 
     void writeToFile( double time, const ParticleArray &particles );
+
+    ScalarField getConcentration( const ParticleArray &particles );
 };

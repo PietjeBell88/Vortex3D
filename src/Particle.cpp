@@ -66,6 +66,11 @@ int Particle::getNum() const
     return num;
 }
 
+const Vector3d &Particle::getStartPos() const
+{
+    return startPos;
+}
+
 void Particle::setPos( const Vector3d &pos )
 {
     this->pos = pos;

@@ -63,7 +63,7 @@ public:
     int getNum() const;
     void setNum( int num );
 
-
+    const Vector3d &getStartPos() const;
 
     // Other stuff
     double spawnTime() const;

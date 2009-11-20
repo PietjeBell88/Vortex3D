@@ -116,9 +116,9 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
 //         - (4) Relative Time, needed for average fall time.
 // In/Out: - (3) The particlearray of which the particle is to be removed.
 // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
-void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
+void checkParticles( const Vortex3dParam &param, Vortex *the_vortex, Emitter *the_emitter,
                      ParticleArray *particles, double relative_time,
-                     double *average_fall_time, double *particles_out )
+                     double *total_fall_velocity, int *particles_out )
 {
 #pragma omp critical
     {
@@ -129,23 +129,38 @@ void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
         // Loop until there are no more particles left
         while ( p < particles->getLength() )
         {
-            const Vector3d & p_pos = particles->getParticle( p ).getPos(); // Reference variable for readability
+            const Particle & particle = particles->getParticle( p );
+            const Vector3d & p_pos = particle.getPos(); // Reference variable for readability
 
-            // Check if the particle is at the edge, or outside of the box
-            if ( the_vortex->outsideBox( p_pos ) )
-            {
-                double life_time = the_emitter->reset( p, relative_time, particles );
-                
-                (*average_fall_time) = ((*particles_out) * (*average_fall_time)
-                        + life_time) / ((*particles_out) + 1);
+            // Check if the particle is outside the box
+            switch ( the_vortex->outsideBox( p_pos ) ) {
+                case 0:
+                    // Particle is still in the box
 
-                ++(*particles_out);
-            }
-            // The last particle which was moved to p might also be out-of-range and thus
-            // also has to be checked. Only when nothing was moved can you safely increase p.
-            else
-            {
-                p++;
+                    // The last particle which was might have been moved to p on removal might also be out-of-range 
+                    // and thus also has to be checked. Only when nothing was moved can you safely increase p.
+                    p++;
+                    break;
+                case 1:
+                    // Particle has left the box at the bottom or top
+                    if ( param.b_avgfallvelocity )
+                    {
+                        (*total_fall_velocity) = *total_fall_velocity + ( (p_pos(2) - particle.getStartPos()(2)) / 
+                                                                              ((relative_time - particle.spawnTime()) * param.t_ref) /
+                                                                          param.terminal_velocity );
+                        ++(*particles_out);
+                    }
+
+                    the_emitter->reset( p, relative_time, particles );
+                    break;
+                case 2:
+                    // Has left the box somewhere else than the bottom or top
+                    the_emitter->reset( p, relative_time, particles );
+                    break;
+                default:
+                    printf("Unknown return value from the_vortex->outsideBox()\n");
+                    exit(1);
+                    break;
             }
         }
     }
@@ -226,6 +241,15 @@ int main( int argc, char* argv[] )
     //////////////
     // Allocating memory for the array that holds the particles, and initializing (possibly emitting the first particles);
     ParticleArray particles( param.maxparticles );
+
+    // Steady concentration calculation variables
+    ScalarField final_concentration = outputter->getConcentration( particles );
+    ScalarField concentration = outputter->getConcentration( particles );
+    bool gotFinalConc = false;
+    double prev_error = 0;
+    double prev_time = 0;
+    
+    // Emit the particles
     the_emitter->init( &particles );
 
 
@@ -233,48 +257,119 @@ int main( int argc, char* argv[] )
     // READY, SET, GO!
 
     // Needed to calculate the average fall time.
-    double average_fall_time = 0;
-    double particles_out = 0;
-
-    //
-    int t = 0;
+    double total_fall_velocity = 0;
+    int particles_out = 0;
 
     outputter->writeToFile( 0.0, particles );
 
     // If outputtype = 3, we're done so we can output and stop.
     if ( param.outputtype == 3 )
         exit( 0 );
- 
+
+    int t = 1;
+    double relative_time = 0;
     double time_next_output = param.outputinterval;
 
     // Maximum number iterations (when some particles never leave the box, or when reset_particles = 1)
-    for ( t = 1; t <= param.max_t; t++ )
+    while ( t <= param.max_t )
     {
-        double relative_time = t * param.duration / param.max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
+        relative_time = t * param.duration / param.max_t; // Relative time in fraction of T_l (going around time); goes from 0->duration
         double time = (t * param.dt) / param.max_t; // Absolute time in seconds.
 
         writeProgress( (t * 100) / param.max_t ); // Display progress on stdout, e.g. [45%]
 
         // Move the particles
         moveParticles( the_vortex, the_emitter, &particles, param );
-        checkParticles( the_vortex, the_emitter, &particles, relative_time,
-                &average_fall_time, &particles_out ); // Check the particles to see if any of them are outside the box. Also updates
+        // Check the particles to see if any of them are outside the box.
+        checkParticles( param, the_vortex, the_emitter, &particles,
+                        relative_time, &total_fall_velocity, &particles_out );
 
         // Write to file
         if ( relative_time >= time_next_output )
         {
             outputter->writeToFile( time, particles );
+           
+            if ( param.b_timesteady ) 
+            {
+                t = t;
+                // If this is the last cycle in the first loop, get the final concentration
+                // FIXME: This is not the way this should be done, resetting all parameters and stuff.
+                //        Maybe moving the iterations to 'mover' class that receives the a ParticleArray, Emitter, Vortex and Output.
+                if ( !gotFinalConc  && time_next_output + param.outputinterval >= param.duration )
+                {
+                    // Set the final concentration, and restart the loop to find the time where 
+                    // the concentration is within error_k of the final concentration.
+                    final_concentration = outputter->getConcentration( particles );
+                    gotFinalConc = true;
+
+                    // Reset all time counters
+                    t = 0;
+                    time_next_output = 0;
+                    relative_time = 0;
+
+                    // Reset the particles
+                    ParticleArray particles2( param.maxparticles );
+                    particles = particles2;
+                    the_emitter->init( &particles );
+
+                    // Do not output anything in the second loop.
+                    param.outputtype = 0;
+                }
+
+                else if ( gotFinalConc ) 
+                {
+                    // We don't break out of the loop when the concentration difference is below
+                    // the threshold, because there might be cases where the error reaches below
+                    // the threshold, but then rises again.
+                    concentration = outputter->getConcentration( particles );
+                
+                    double error = fro_diff( final_concentration, concentration );
+
+                    if ( error > prev_error || 
+                         error < prev_error && error > param.errork  || 
+                         error < prev_error && prev_error >= param.errork && error < param.errork && error != 0 )
+                    {
+                        prev_error = error;
+                        prev_time = relative_time;
+                    }
+                }
+            }
             time_next_output += param.outputinterval;
         }
 
+        
+
         the_emitter->update( relative_time, &particles );
+
+        t++;
 
         // Break when there are no more particles to plot.
         if ( particles.getLength() == 0 )
             break;
     }
+    
+    // 
+    printf("\nDone! Completed %d cycles.\n\n", t-1);
 
+    if ( param.b_avgfallvelocity )
+    {
+        // Avoid the division by zero if no particles left the box
+        if ( particles_out == 0 )
+            printf( "No particles fell through, calculation of average fall velocity not possible\n" );
+        else
+            printf( "Average Fall Velocity: %.5g * V_t (based on %d particles)\n", total_fall_velocity / particles_out, particles_out );
+    }
 
+    if ( param.b_timesteady ) 
+    {
+        // Distinguish between the steady concentration where there are no particles at all and
+        // the one where there are particles.
+        if ( particles.getLength() == 0 )
+            printf( "Time till steady: All particles left the box, no calculation possible.\n" );
+        else
+            printf( "Time till steady: %.5g * T_l\n",  prev_time);
+    }
+        
     delete the_vortex;
     delete the_emitter;
     delete outputter;
@@ -295,10 +390,14 @@ void show_help()
             "                                                     1: Particle index, position and absolute velocity.\n"
             "                                                     2: Relative concentration.\n"
             "                                                     3: Vortex VectorField.\n"
+            "                                                     4: Fall velocity profile.\n"
             "      --outputformat <int> (=1)                      1: Byte\n"
             "                                                     2: Matlab\n"
             "                                                     3: Text\n"
             "                                                     4: Tecplot\n"
+            "      --avgfallvelocity                              Calculate and print the average fall velocity.\n"
+            "      --timesteady                                   Calculate and print the time needed to reach a stable solution profile.\n"
+            "      --errork <double> (=0.01)                      The threshold for the steady concentration calculation.\n"
             "      --outputinterval <double> (=1.0)               Write every <n cycles | relative_time>.\n"
             "      --outputintervalmethod <int> (=1)              Change behavior of outputinterval.\n"
             "                                                       1: every n cycles\n"
@@ -380,6 +479,9 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         >> Option( 'a', "maxparticles", param->maxparticles, 1000 )
         >> Option( 'a', "gravity", param->grav, 1 )
         >> OptionPresent( 'a', "rotategrav", param->rotategrav )
+        >> OptionPresent( 'a', "avgfallvelocity", param->b_avgfallvelocity )
+        >> OptionPresent( 'a', "timesteady", param->b_timesteady )
+        >> Option( 'a', "errork", param->errork, 0.01 )
         >> Option( 'a', "dtscale", param->dtscale, 0.5 )
      ;
     //////////////////////////////////////
@@ -504,4 +606,25 @@ void printParam( const Vortex3dParam &param )
     printf( "Maximum time:        %.5g\n", param.max_t * param.dt );
     printf( "Timestep size (dt):  %.5g\n", param.dt );
     printf( "Amount of timesteps: %d\n",   param.max_t );
+}
+
+// Use the frobenius norm to get a value for the difference between two matrices
+double fro_diff( const ScalarField &firstField, const ScalarField &secondField ) 
+{
+    double sum = 0;
+    int i,j,k;
+#pragma omp parallel for shared(firstField, secondField) private(i, j, k) reduction(+: sum) 
+    for ( i = 0; i < firstField.shape()(0); i++ )
+    {
+        for ( j = 0; j < firstField.shape()(1); j++ )
+        {
+            for ( k = 0; k < firstField.shape()(2); k++ )
+            {
+                double temp1 = firstField(i,j,k);
+                double temp2 = secondField(i,j,k);
+                sum += pow( firstField(i,j,k) - secondField(i,j,k), 2 );
+            }
+        }
+    }
+    return pow( sum, 0.5 );
 }

@@ -80,8 +80,7 @@ inline void TecplotOutput::writeConcentration( bool first_call, double time, con
             time, grid(0), grid(1), grid(2) );
         first_call = false;
 
-        ScalarField concentration( grid(0), grid(1), grid(2) );
-        getConcentration( particles, &concentration );
+        ScalarField &concentration = getConcentration( particles );
 
         for ( int i = 0; i < grid(0); i++ )
         {
@@ -107,8 +106,7 @@ inline void TecplotOutput::writeConcentration( bool first_call, double time, con
             VARSHARELIST=([1-3]=1)\n",
             time, grid(0), grid(1), grid(2) );
 
-        ScalarField concentration( grid(0), grid(1), grid(2) );
-        getConcentration( particles, &concentration );
+        ScalarField &concentration = getConcentration( particles );
 
         for ( int i = 0; i < grid(0); i++ )
         {

@@ -51,8 +51,8 @@ struct Vortex3dParam {
     // Cmdline parameters
     int vortextype, reset_particles, maxparticles, grav, emittertype, outputtype, outputformat, outputintervalmethod;
     double radius, velocity, angle, p_density, p_diameter, fl_mu, fl_density,
-           duration, p_velocity, dtscale, p_rate, outputinterval;
-    bool interpolate, rotategrav;
+           duration, p_velocity, dtscale, p_rate, outputinterval, errork;
+    bool interpolate, rotategrav, b_avgfallvelocity, b_timesteady;
     string parameters, roi, dimensions, datafile;
 
     // Calculated parameters
@@ -89,7 +89,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                     ParticleArray *particles, const Vortex3dParam &param );
 void checkParticles( Vortex *the_vortex, Emitter *the_emitter,
                      ParticleArray *particles, double relative_time,
-                     double *average_fall_time, double *particles_out );
+                     double *average_fall_time, int *particles_out );
 
 inline void writeProgress( int perc );
 
@@ -101,4 +101,6 @@ void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid 
                              TDelimiter *delimiter, double *dx, double *dy, double *dz );
 
 void printParam( const Vortex3dParam &param );
+
+double fro_diff( const ScalarField &firstField, const ScalarField &secondField );
 

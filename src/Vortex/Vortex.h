@@ -100,7 +100,7 @@ public:
     virtual ~Vortex();
 
     void initInterpolate();
-    bool outsideBox( const Vector3d &pos );
+    int outsideBox( const Vector3d &pos );
 
     // And just 3 "important" public functions. The rest is private :>
     Vector3d getDuDtAt( const Vector3d &pos );

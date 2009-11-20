@@ -78,15 +78,17 @@ void Vortex::initInterpolate()
 
 ////////////////////
 // Public Functions
-bool Vortex::outsideBox( const Vector3d &pos )
+int Vortex::outsideBox( const Vector3d &pos )
 {
-    if ( pos(0) <= delimiter(0, 0) || pos(0) > delimiter(0, 1) ||
-         pos(1) <= delimiter(1, 0) || pos(1) > delimiter(1, 1) ||
-         pos(2) <= delimiter(2, 0) || pos(2) > delimiter(2, 1) )
-    {
-        return true;
-    }
-    return false;
+    if ( pos(2) <= delimiter(2, 0) || pos(2) > delimiter(2, 1) )
+        return 1;
+
+    else if ( pos(0) <= delimiter(0, 0) || pos(0) > delimiter(0, 1) ||
+              pos(1) <= delimiter(1, 0) || pos(1) > delimiter(1, 1) )
+        return 2;
+
+    else
+        return 0;
 }
 
 Vector3d Vortex::getDuDtAt( const Vector3d &pos )
