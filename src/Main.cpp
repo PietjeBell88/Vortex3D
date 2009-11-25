@@ -32,8 +32,6 @@
 // TODO: Outputting data in HDF5 or whatever
 // TODO: different ways of specifying what the vortex should look like
 
-#define _CRT_SECURE_NO_WARNINGS
-
 ///////////
 // Headers
 #include "Main.h"
@@ -287,53 +285,55 @@ int main( int argc, char* argv[] )
 // Help 
 void show_help()
 {
-    printf(
-            "\nGeneral Options:\n\
-  --help                                         Produce help message.\n\
-  --reset_particles <int> (=0)                   0 = Remove particle when it leaves the box.\n\
-                                                 1 = Reset particle to start position.\n\
-  --datafile <string> (=test.txt)                The path to the output file.\n\
-  --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n\
-                                                 2: Relative concentration.\n\
-                                                 3: Vortex VectorField.\n\
-  --outputformat <int> (=1)                      1: Byte\n\
-                                                 2: Matlab\n\
-                                                 3: Text\n\
-                                                 4: Tecplot\n\
-  --outputinterval <double> (=1.0)               Write every <n cycles | relative_time>.\n\
-  --outputintervalmode <int> (=1)                Change behavior of outputinterval.\n\
-                                                 1: every n cycles\n\
-                                                 2: every relative_time\n\
-  --interpolate                                  Use interpolation instead of direct evaluation.\n\
-  --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n\
-  --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n\
-  --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n\
-  --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n\
-  --rotategrav                                   Rotate not the vortex but the gravity.\n\
-\n\
-Vortex Properties:\
-  --vortextype <int> (=1)                        1: Burgers Vortex, (stretching_r,stretching_z)\n\
-  --radius <double> (=0.1)                       The typical radius of the vortex.\n\
-  --velocity <double> (=0.001)                   Rotational velocity at the radius.\n\
-  --parameters <string> (=)                      Other values the specified vortex might need, seperated by comma (see vortextype).\n\
-  --angle <double> (=0.0)                        Angle of the vortex with the z-axis.\n\
-  --roi <string> (=[-5:101:5,-5:101:5,-5:101:5]) Region of interest, middle value is not used when not using interpolation.\n\
-\n\
-Particle/Emitter Properties:\
-  --emittertype <int> (=1)                       1: Emit the grid specified with --dimensions once.\n\
-                                                 2: Emit continuously from the --dimensions grid.\n\
-                                                 3: Emit continuously and random from the --dimensions grid.\n\
-  --dimensions <string> (=[-4:30:4,0:1:0,4:1:4]) X x Y x Z grid of particles\n\
-                                                 Format: [start_x:steps_x:end_x,\n\
-                                                          start_y:steps_y:end_y,\n\
-                                                          start_z:steps_z:end_z].\n\
-  --p_rate <double> (=100.0)                     Amount of particles emitted per T_l.\n\
-  --p_density <double> (=1000.0)                 Density of the particles (kg/m3).\n\
-  --p_diameter <double> (=5.0E-5)                Diameter of the particles (m).\n\
-  --fl_mu <double> (=1.8e-005)                   Fluid Dynamic Viscocity (Pa s).\n\
-  --fl_density <double> (=1.0)                   Fluid Density (kg/m3).\n\
-  --p_velocity <double> (=0.0)                   Particle's initial velocity (z-direction only) in terms of the terminal velocity.\n\
-  " );
+    printf( 
+            "\nGeneral Options:\n"
+            "  -h, --help                                         Produce help message.\n"
+            "      --reset_particles <int> (=0)                   0 = Remove particle when it leaves the box.\n"
+            "                                                     1 = Reset particle to start position.\n"
+            "      --datafile <string> (=test.txt)                The path to the output file.\n"
+            "      --outputtype <int> (=1)                        1: Particle index, position and absolute velocity.\n"
+            "                                                     2: Relative concentration.\n"
+            "                                                     3: Vortex VectorField.\n"
+            "      --outputformat <int> (=1)                      1: Byte\n"
+            "                                                     2: Matlab\n"
+            "                                                     3: Text\n"
+            "                                                     4: Tecplot\n"
+            "      --outputinterval <double> (=1.0)               Write every <n cycles | relative_time>.\n"
+            "      --outputintervalmode <int> (=1)                Change behavior of outputinterval.\n"
+            "                                                       1: every n cycles\n"
+            "                                                       2: every relative_time\n"
+            "      --interpolate                                  Use interpolation instead of direct evaluation.\n"
+            "      --duration <double> (=1.0)                     Duration of computation as fraction T_l.\n"
+            "      --maxparticles <int> (=1000)                   Maximum particles, no new particles will be emitted if the number of particles exceeds this parameter.\n"
+            "      --gravity <double> (=1.0)                      Fraction of 9.81m/s^2.\n"
+            "      --dtscale <double> (=0.5)                      dt = dtscale * systemtime.\n"
+            "      --rotategrav                                   Rotate not the vortex but the gravity.\n"
+            "\n"
+            "Output Options\n"
+            "\n"
+            "      Vortex Properties:\n"
+            "      --vortextype <int> (=1)                        1: Burgers Vortex, (stretching_r,stretching_z)\n"
+            "      --radius <double> (=0.1)                       The typical radius of the vortex.\n"
+            "      --velocity <double> (=0.001)                   Rotational velocity at the radius.\n"
+            "      --parameters <string> (=)                      Other values the specified vortex might need, seperated by comma (see vortextype).\n"
+            "      --angle <double> (=0.0)                        Angle of the vortex with the z-axis.\n"
+            "      --roi <string> (=[-5:101:5,-5:101:5,-5:101:5]) Region of interest, middle value is not used when not using interpolation.\n"
+            "\n"
+            "      Particle/Emitter Properties:\n"
+            "      --emittertype <int> (=1)                       1: Emit the grid specified with --dimensions once.\n"
+            "                                                     2: Emit continuously from the --dimensions grid.\n"
+            "                                                     3: Emit continuously and random from the --dimensions grid.\n"
+            "      --dimensions <string> (=[-4:30:4,0:1:0,4:1:4]) X x Y x Z grid of particles\n"
+            "                                                     Format: [start_x:steps_x:end_x,\n"
+            "                                                              start_y:steps_y:end_y,\n"
+            "                                                              start_z:steps_z:end_z].\n"
+            "      --p_rate <double> (=100.0)                     Amount of particles emitted per T_l.\n"
+            "      --p_density <double> (=1000.0)                 Density of the particles (kg/m3).\n"
+            "      --p_diameter <double> (=5.0E-5)                Diameter of the particles (m).\n"
+            "      --fl_mu <double> (=1.8e-005)                   Fluid Dynamic Viscocity (Pa s).\n"
+            "      --fl_density <double> (=1.0)                   Fluid Density (kg/m3).\n"
+            "      --p_velocity <double> (=0.0)                   Particle's initial velocity (z-direction only) in terms of the terminal velocity.\n"
+          );
 }
 
 
