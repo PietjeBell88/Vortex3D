@@ -299,7 +299,7 @@ void show_help()
             "                                                     3: Text\n"
             "                                                     4: Tecplot\n"
             "      --outputinterval <double> (=1.0)               Write every <n cycles | relative_time>.\n"
-            "      --outputintervalmode <int> (=1)                Change behavior of outputinterval.\n"
+            "      --outputintervalmethod <int> (=1)              Change behavior of outputinterval.\n"
             "                                                       1: every n cycles\n"
             "                                                       2: every relative_time\n"
             "      --interpolate                                  Use interpolation instead of direct evaluation.\n"
