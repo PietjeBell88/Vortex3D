@@ -98,6 +98,8 @@ void Output::writeToFile( double time, const ParticleArray &particles )
     static bool first_call = true;
 
     switch ( outputtype ) {
+        case 0:
+            // Do nothing.
         case 1:
             writeTrajectories( first_call, time, particles );
             break;
