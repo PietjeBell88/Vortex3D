@@ -64,7 +64,7 @@ struct Vortex3dParam {
     double beta; // This ratio is used in the equation of motion
     double tau_a;
     double terminal_velocity;
-    double v_ref;
+    double t_ref;
 
     // Emitter
     TGrid emitter_grid;

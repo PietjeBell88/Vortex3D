@@ -421,12 +421,12 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
 
     param->dt = param->dtscale * param->systemtime;
     
-    param->v_ref = 2 * PI * param->radius / param->velocity;
+    param->t_ref = 2 * PI * param->radius / param->velocity;
 
     param->terminal_velocity = (1 - (1 / param->beta)) * param->systemtime * -9.81;
     param->p_velocity = param->p_velocity * param->terminal_velocity;
 
-    param->max_t = (int) ( param->duration * param->v_ref / param->dt );
+    param->max_t = (int) ( param->duration * param->t_ref / param->dt );
 
     /////////////////////////////////////////////////////////////
     // And some more checking?
@@ -437,7 +437,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         if ( param->outputinterval < 1 )
             printf( "Error: outputinterval should be >= 1 on intervalmode 1." );
 
-        param->outputinterval = param->outputinterval * param->dt / param->v_ref;
+        param->outputinterval = param->outputinterval * param->dt / param->t_ref;
     }
     else if ( param->outputintervalmethod == 2 )
     {
@@ -446,10 +446,10 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
         
         // If the absolute time between outputs is smaller than dt (the iteration) 
         // exit with error.
-        if ( param->outputinterval * param->v_ref / param->dt < 1 ) 
+        if ( param->outputinterval * param->t_ref / param->dt < 1 ) 
         {
             printf( "Error: outputcycle is smaller than 1: %g.\n"     
-                    "       Please lower dtscale to accomodate.\n", param->outputinterval * param->v_ref / param->dt );
+                    "       Please lower dtscale to accomodate.\n", param->outputinterval * param->t_ref / param->dt );
             exit(1);
         }
     }
