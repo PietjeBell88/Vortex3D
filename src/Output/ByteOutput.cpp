@@ -98,7 +98,7 @@ inline void ByteOutput::writeConcentration( bool first_call, double time, const 
         fwrite( buf, 8, 10, f );
     }
 
-    ScalarField &concentration = getConcentration( particles );
+    ScalarField concentration = getConcentration( particles );
 
     for ( int i = 0; i < grid(0); i++ )
     {

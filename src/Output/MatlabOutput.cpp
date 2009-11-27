@@ -87,7 +87,7 @@ inline void MatlabOutput::writeTrajectories( bool first_call, double time, const
 // Concentration
 inline void MatlabOutput::writeConcentration( bool first_call, double time, const ParticleArray &particles )
 {
-    ScalarField &concentration = getConcentration( particles );
+    ScalarField concentration = getConcentration( particles );
 
     for ( int i = 0; i < grid(0); i++ )
     {
