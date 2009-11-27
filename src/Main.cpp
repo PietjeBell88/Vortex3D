@@ -38,20 +38,20 @@
 
 #include <stdio.h>
 
-#include "..\external\getopt_pp.h"
+#include "../external/getopt_pp.h"
 
-#include "Vortex\BurgersVortex.h"
+#include "Vortex/BurgersVortex.h"
 
-#include "Output\Output.h"
-#include "Output\ByteOutput.h"
-#include "Output\MatlabOutput.h"
-#include "Output\TextOutput.h"
-#include "Output\TecplotOutput.h"
+#include "Output/Output.h"
+#include "Output/ByteOutput.h"
+#include "Output/MatlabOutput.h"
+#include "Output/TextOutput.h"
+#include "Output/TecplotOutput.h"
 
-#include "Emitter\Emitter.h"
-#include "Emitter\GridEmitter.h"
-#include "Emitter\GridOnceEmitter.h"
-#include "Emitter\RandomEmitter.h"
+#include "Emitter/Emitter.h"
+#include "Emitter/GridEmitter.h"
+#include "Emitter/GridOnceEmitter.h"
+#include "Emitter/RandomEmitter.h"
 
 #include "ParticleArray.h"
 #include "Particle.h"

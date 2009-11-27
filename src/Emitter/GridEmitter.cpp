@@ -29,8 +29,8 @@
 // Headers
 #include "GridEmitter.h"
 
-#include "..\ParticleArray.h"
-#include "..\Particle.h"
+#include "../ParticleArray.h"
+#include "../Particle.h"
 
 
 ///////////////

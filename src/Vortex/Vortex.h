@@ -35,8 +35,8 @@
 #include <blitz/tinyvec.h>
 #include <blitz/tinyvec-et.h>
 
-#include "..\Typedefs.h"
-#include "..\Main.h"
+#include "../Typedefs.h"
+#include "../Main.h"
 
 
 /////////////

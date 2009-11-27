@@ -29,7 +29,7 @@
 ///////////
 // Headers
 #include "Vortex.h"
-#include "..\Typedefs.h"
+#include "../Typedefs.h"
 
 
 /////////////////

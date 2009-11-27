@@ -29,10 +29,10 @@
 // Headers
 #include "RandomEmitter.h"
 
-#include "..\..\external\MTRand.h"
+#include "../../external/MTRand.h"
 
-#include "..\ParticleArray.h"
-#include "..\Particle.h"
+#include "../ParticleArray.h"
+#include "../Particle.h"
 
 
 ///////////////

@@ -30,8 +30,8 @@
 ///////////
 // Headers
 #include <fstream>
-#include "..\Typedefs.h"
-#include "..\Main.h" 
+#include "../Typedefs.h"
+#include "../Main.h" 
 
 
 ////////////////////////
