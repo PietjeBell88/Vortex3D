@@ -118,7 +118,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
 // Out:    - (return) The relative time (fraction of going around time T_l) the particle spent in the box.
 void checkParticles( const Vortex3dParam &param, Vortex *the_vortex, Emitter *the_emitter,
                      ParticleArray *particles, double relative_time,
-                     double *total_fall_velocity, int *particles_out )
+                     double *total_fall_velocity, int *particles_out, Output *outputter )
 {
 #pragma omp critical
     {
@@ -143,13 +143,19 @@ void checkParticles( const Vortex3dParam &param, Vortex *the_vortex, Emitter *th
                     break;
                 case 1:
                     // Particle has left the box at the bottom or top
+                    double fall_velocity = (p_pos(2) - particle.getStartPos()(2)) / 
+                                               ((relative_time - particle.spawnTime()) * param.t_ref) /
+                                               param.terminal_velocity;
+
                     if ( param.b_avgfallvelocity )
                     {
-                        (*total_fall_velocity) = *total_fall_velocity + ( (p_pos(2) - particle.getStartPos()(2)) / 
-                                                                              ((relative_time - particle.spawnTime()) * param.t_ref) /
-                                                                          param.terminal_velocity );
+                        (*total_fall_velocity) = *total_fall_velocity + fall_velocity;
                         ++(*particles_out);
                     }
+
+                    // FIXME: this should be in the loop, inside the writeToFile function.
+                    if ( param.outputtype == 4 )
+                        outputter->writeFallVelocity( particle.spawnTime(), particle.getStartPos(), fall_velocity );
 
                     the_emitter->reset( p, relative_time, particles );
                     break;
@@ -282,12 +288,14 @@ int main( int argc, char* argv[] )
         moveParticles( the_vortex, the_emitter, &particles, param );
         // Check the particles to see if any of them are outside the box.
         checkParticles( param, the_vortex, the_emitter, &particles,
-                        relative_time, &total_fall_velocity, &particles_out );
+                        relative_time, &total_fall_velocity, &particles_out, outputter );
 
         // Write to file
         if ( relative_time >= time_next_output )
         {
-            outputter->writeToFile( time, particles );
+            // FIXME: writeToFile should not be in an if statement
+            if ( param.outputtype != 4 )
+                outputter->writeToFile( time, particles );
            
             if ( param.b_timesteady ) 
             {

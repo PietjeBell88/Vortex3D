@@ -132,5 +132,7 @@ inline void MatlabOutput::writeVelocityField( bool first_call, double time )
     }
 }
 
-
+void MatlabOutput::writeFallVelocity( double time, Vector3d pos, double velocity )
+{
+}
 

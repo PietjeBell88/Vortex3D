@@ -46,4 +46,6 @@ public:
     ByteOutput( const Vortex3dParam &param, Vortex *the_vortex );
 
     virtual ~ByteOutput();
+    // FIXME? don't know if this should be a seperate output function
+    virtual void writeFallVelocity( double time, Vector3d pos, double velocity );
 };

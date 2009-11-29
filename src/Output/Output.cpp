@@ -112,6 +112,9 @@ void Output::writeToFile( double time, const ParticleArray &particles )
         case 3:
             writeVelocityField( first_call, time );
             break;
+        // FIXME, here is where the fall velocity profile call should be
+        case 4:
+            break;
         default:
             std::cout << "ERROR: Unknown outputtype.";
     } 

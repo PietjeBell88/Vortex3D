@@ -141,5 +141,25 @@ inline void ByteOutput::writeVelocityField( bool first_call, double time )
     }
 }
 
+// FIXME, should receive the first_call bool
+void ByteOutput::writeFallVelocity( double time, Vector3d pos, double velocity )
+{
+    static bool first_call = true;
 
+    if ( first_call )
+    {
+        // Write the and delimiter values to file.
+        // i.e. buf[] = { xmin, xmax, ymin, ymax, zmin, zmax }
+        double buf[] = { delimiter(0, 0), delimiter(0, 1),
+                         delimiter(1, 0), delimiter(1, 1),
+                         delimiter(2, 0), delimiter(2, 1) };
+        fwrite( buf, 8, 6, f );
+
+        first_call = false;
+    }
+
+    double buf[] = { time, pos(0), pos(1), pos(2), velocity };
+
+    fwrite( buf, 8, 5, f );
+}
 

@@ -76,6 +76,8 @@ public:
     virtual ~Output();
 
     void writeToFile( double time, const ParticleArray &particles );
+    // FIXME? don't know if this should be a seperate output function
+    virtual void writeFallVelocity( double time, Vector3d pos, double velocity ) = 0;
 
     ScalarField getConcentration( const ParticleArray &particles );
 };

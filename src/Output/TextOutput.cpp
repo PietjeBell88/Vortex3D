@@ -141,3 +141,7 @@ inline void TextOutput::writeVelocityField( bool first_call, double time )
     fprintf( f, "\n" );
 }
 
+void TextOutput::writeFallVelocity( double time, Vector3d pos, double velocity )
+{
+}
+

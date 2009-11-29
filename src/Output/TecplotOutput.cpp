@@ -149,3 +149,6 @@ inline void TecplotOutput::writeVelocityField( bool first_call, double time )
     fprintf( f, "\n" );
 }
 
+void TecplotOutput::writeFallVelocity( double time, Vector3d pos, double velocity )
+{
+}
