@@ -104,3 +104,7 @@ void printParam( const Vortex3dParam &param );
 
 double fro_diff( const ScalarField &firstField, const ScalarField &secondField );
 
+double dist_diff ( const ParticleArray &current, const ParticleArray &final );
+
+double getR ( const Vector3d pos );
+

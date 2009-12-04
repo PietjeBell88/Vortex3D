@@ -248,10 +248,9 @@ int main( int argc, char* argv[] )
     // Allocating memory for the array that holds the particles, and initializing (possibly emitting the first particles);
     ParticleArray particles( param.maxparticles );
 
-    // Steady concentration calculation variables
-    ScalarField final_concentration = outputter->getConcentration( particles );
-    ScalarField concentration = outputter->getConcentration( particles );
-    bool gotFinalConc = false;
+    // Steady particles calculation variables
+    ParticleArray particles_final( param.maxparticles );
+    bool gotFinalParticles = false;
     double prev_error = 0;
     double prev_time = 0;
     
@@ -303,12 +302,14 @@ int main( int argc, char* argv[] )
                 // If this is the last cycle in the first loop, get the final concentration
                 // FIXME: This is not the way this should be done, resetting all parameters and stuff.
                 //        Maybe moving the iterations to 'mover' class that receives the a ParticleArray, Emitter, Vortex and Output.
-                if ( !gotFinalConc  && time_next_output + param.outputinterval >= param.duration )
+                if ( !gotFinalParticles  && time_next_output + param.outputinterval >= param.duration )
                 {
                     // Set the final concentration, and restart the loop to find the time where 
                     // the concentration is within error_k of the final concentration.
-                    final_concentration = outputter->getConcentration( particles );
-                    gotFinalConc = true;
+                    //final_concentration = outputter->getConcentration( particles );
+                    particles_final = particles;
+                    
+                    gotFinalParticles = true;
 
                     // Reset all time counters
                     t = 0;
@@ -324,14 +325,14 @@ int main( int argc, char* argv[] )
                     param.outputtype = 0;
                 }
 
-                else if ( gotFinalConc ) 
+                else if ( gotFinalParticles ) 
                 {
                     // We don't break out of the loop when the concentration difference is below
                     // the threshold, because there might be cases where the error reaches below
                     // the threshold, but then rises again.
-                    concentration = outputter->getConcentration( particles );
+                    //concentration = outputter->getConcentration( particles );
                 
-                    double error = fro_diff( final_concentration, concentration );
+                    double error = dist_diff( particles_final, particles );
 
                     if ( error > prev_error || 
                          error < prev_error && error > param.errork  || 
@@ -375,7 +376,7 @@ int main( int argc, char* argv[] )
         if ( particles.getLength() == 0 )
             printf( "Time till steady: All particles left the box, no calculation possible.\n" );
         else
-            printf( "Time till steady: %.5g * T_l\n",  prev_time);
+            printf( "Time till steady: %.5g * T_ref\n",  prev_time);
     }
         
     delete the_vortex;
@@ -635,4 +636,21 @@ double fro_diff( const ScalarField &firstField, const ScalarField &secondField )
         }
     }
     return pow( sum, 0.5 );
+}
+
+// FIXME: This function does not work if any particle leave the box or if new particles are emitted during calculations
+double dist_diff ( const ParticleArray &current, const ParticleArray &final )
+{
+    double sum = 0;
+    int i;
+#pragma omp parallel for shared(current, final) private(i) reduction(+: sum) 
+    for ( i = 0; i < final.getLength(); i++ ) 
+        sum += abs(  ( getR(final.getParticle( i ).getPos()) - getR(current.getParticle( i ).getPos()) ) / getR( final.getParticle( i ).getPos() ) );
+
+    return sum/final.getLength();
+}
+
+double getR ( const Vector3d pos )
+{
+    return pow(pos(0)*pos(0)+pos(2)*pos(2),0.5);
 }
