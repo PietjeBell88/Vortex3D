@@ -74,12 +74,12 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
     const double & beta = param.beta;
     const double & tau_a = param.tau_a;
 
-    /* 
+    /*
      * Include Drag, Gravity, Stresses and Added Mass in the equation of motion.
-     * See Formula 11 in M.F. Cargnelutti and Portela's "Influence of the resuspension on 
+     * See Formula 11 in M.F. Cargnelutti and Portela's "Influence of the resuspension on
      * the particle sedimentation in wall-bounded turbulent flows")
-     */ 
-    
+     */
+
 #pragma omp parallel for
     for ( int p = 0; p < particles->getLength(); p++ )
     {
@@ -91,7 +91,7 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
         const Vector3d & p_vel = particle.getVel();
 
         // Calculate the fluid velocity and accelertion at the position of the particle.
-        const Vector3d & v_vel = the_vortex->getVelocityAt( p_pos ); 
+        const Vector3d & v_vel = the_vortex->getVelocityAt( p_pos );
         const Vector3d & Du_Dt = the_vortex->getDuDtAt( p_pos );
 
         // Particle equation of motion.
@@ -99,10 +99,10 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
                             * gravity + 1.5 / (beta + 0.5) * Du_Dt) * dt;
 
         // Give the particle his new velocity and position.
-        particle.setVel( p_vel + dv ); 
-        particle.setPos( p_pos + p_vel * dt ); 
+        particle.setVel( p_vel + dv );
+        particle.setPos( p_pos + p_vel * dt );
 
-        // Write the particle back to the array (maybe, and hopefully, it will be written 
+        // Write the particle back to the array (maybe, and hopefully, it will be written
         // directly to the array instead of making a temporary object like "particle" is.
         particles->setParticle( p, particle );
     }
@@ -122,7 +122,7 @@ void checkParticles( const Vortex3dParam &param, Vortex *the_vortex, Emitter *th
 {
 #pragma omp critical
     {
-        // For each particle, check if it is outside or at the edge of the box; 
+        // For each particle, check if it is outside or at the edge of the box;
         // the edge counts as problematic too because then the interpolation fails.
         int p = 0;
 
@@ -137,13 +137,13 @@ void checkParticles( const Vortex3dParam &param, Vortex *the_vortex, Emitter *th
                 case 0:
                     // Particle is still in the box
 
-                    // The last particle which was might have been moved to p on removal might also be out-of-range 
+                    // The last particle which was might have been moved to p on removal might also be out-of-range
                     // and thus also has to be checked. Only when nothing was moved can you safely increase p.
                     p++;
                     break;
                 case 1:
                     // Particle has left the box at the bottom or top
-                    double fall_velocity = (p_pos(2) - particle.getStartPos()(2)) / 
+                    double fall_velocity = (p_pos(2) - particle.getStartPos()(2)) /
                                                ((relative_time - particle.spawnTime()) * param.t_ref) /
                                                param.terminal_velocity;
 
@@ -207,7 +207,7 @@ int main( int argc, char* argv[] )
     /////////////////////
     // Making the Emitter
     Emitter *the_emitter;
-    
+
     switch ( param.emittertype ) {
         case 1:
             the_emitter = new GridOnceEmitter( param );
@@ -221,7 +221,7 @@ int main( int argc, char* argv[] )
         default:
             cout << "Unknown Emitter type";
             exit( 1 );
-    } 
+    }
 
     /////////////////////
     // Making the Output
@@ -253,7 +253,7 @@ int main( int argc, char* argv[] )
     bool gotFinalParticles = false;
     double prev_error = 0;
     double prev_time = 0;
-    
+
     // Emit the particles
     the_emitter->init( &particles );
 
@@ -295,8 +295,8 @@ int main( int argc, char* argv[] )
             // FIXME: writeToFile should not be in an if statement
             if ( param.outputtype != 4 )
                 outputter->writeToFile( time, particles );
-           
-            if ( param.b_timesteady ) 
+
+            if ( param.b_timesteady )
             {
                 t = t;
                 // If this is the last cycle in the first loop, get the final concentration
@@ -304,11 +304,11 @@ int main( int argc, char* argv[] )
                 //        Maybe moving the iterations to 'mover' class that receives the a ParticleArray, Emitter, Vortex and Output.
                 if ( !gotFinalParticles  && time_next_output + param.outputinterval >= param.duration )
                 {
-                    // Set the final concentration, and restart the loop to find the time where 
+                    // Set the final concentration, and restart the loop to find the time where
                     // the concentration is within error_k of the final concentration.
                     //final_concentration = outputter->getConcentration( particles );
                     particles_final = particles;
-                    
+
                     gotFinalParticles = true;
 
                     // Reset all time counters
@@ -325,17 +325,17 @@ int main( int argc, char* argv[] )
                     param.outputtype = 0;
                 }
 
-                else if ( gotFinalParticles ) 
+                else if ( gotFinalParticles )
                 {
                     // We don't break out of the loop when the concentration difference is below
                     // the threshold, because there might be cases where the error reaches below
                     // the threshold, but then rises again.
                     //concentration = outputter->getConcentration( particles );
-                
+
                     double error = dist_diff( particles_final, particles );
 
-                    if ( error > prev_error || 
-                         error < prev_error && error > param.errork  || 
+                    if ( error > prev_error ||
+                         error < prev_error && error > param.errork  ||
                          error < prev_error && prev_error >= param.errork && error < param.errork && error != 0 )
                     {
                         prev_error = error;
@@ -346,7 +346,7 @@ int main( int argc, char* argv[] )
             time_next_output += param.outputinterval;
         }
 
-        
+
 
         the_emitter->update( relative_time, &particles );
 
@@ -356,8 +356,8 @@ int main( int argc, char* argv[] )
         if ( particles.getLength() == 0 )
             break;
     }
-    
-    // 
+
+    //
     printf("\nDone! Completed %d cycles.\n\n", t-1);
 
     if ( param.b_avgfallvelocity )
@@ -369,7 +369,7 @@ int main( int argc, char* argv[] )
             printf( "Average Fall Velocity: %.5g * V_t (based on %d particles)\n", total_fall_velocity / particles_out, particles_out );
     }
 
-    if ( param.b_timesteady ) 
+    if ( param.b_timesteady )
     {
         // Distinguish between the steady concentration where there are no particles at all and
         // the one where there are particles.
@@ -378,7 +378,7 @@ int main( int argc, char* argv[] )
         else
             printf( "Time till steady: %.5g * T_ref\n",  prev_time);
     }
-        
+
     delete the_vortex;
     delete the_emitter;
     delete outputter;
@@ -386,10 +386,10 @@ int main( int argc, char* argv[] )
 }
 
 ////////
-// Help 
+// Help
 void show_help()
 {
-    printf( 
+    printf(
             "\nGeneral Options:\n"
             "  -h, --help                                         Produce help message.\n"
             "      --reset_particles <int> (=0)                   0 = Remove particle when it leaves the box.\n"
@@ -447,9 +447,9 @@ void show_help()
 
 
 /////////////////////
-// Parse commandline 
+// Parse commandline
 void parse( int argc, char* argv[], Vortex3dParam *param ) {
-    
+
     using GetOpt::GetOpt_pp;
     using GetOpt::Option;
     using GetOpt::OptionPresent;
@@ -495,18 +495,18 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
      ;
     //////////////////////////////////////
     // Do some checking on the parameters
-    
+
     // Gravity (depends on whether you rotate the gravity or the vortex)
     if (!param->rotategrav)
         param->gravity = Vector3d( 0, 0, -9.81 * param->grav );
     else
         param->gravity = Vector3d( 0, sin(param->angle), -cos(param->angle) );
-    
+
     // Read grid+delimiter+deltas for ROI.
-    readGridDelimiterDelta( param->roi, param->radius, &param->roi_grid, &param->roi_delimiter, 
+    readGridDelimiterDelta( param->roi, param->radius, &param->roi_grid, &param->roi_delimiter,
                             &param->roi_dx, &param->roi_dy, &param->roi_dz );
     // Read grid+delimiter+deltas for Emitter.
-    readGridDelimiterDelta( param->dimensions, param->radius, &param->emitter_grid, &param->emitter_delimiter, 
+    readGridDelimiterDelta( param->dimensions, param->radius, &param->emitter_grid, &param->emitter_delimiter,
                             &param->emitter_dx, &param->emitter_dy, &param->emitter_dz );
 
     // Calculate the amount of particles in one grid.
@@ -526,13 +526,13 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     /////////////////////////////////////////////////////////
     // Calculate some extra parameters from the cmdline ones
     param->fl_nu = param->fl_mu / param->fl_density;
-    param->beta = param->p_density / param->fl_density; 
+    param->beta = param->p_density / param->fl_density;
 
     param->systemtime = param->p_density * param->p_diameter * param->p_diameter / (18 * param->fl_mu);
     param->tau_a = (param->beta + 0.5) / param->beta * param->systemtime;
 
     param->dt = param->dtscale * param->systemtime;
-    
+
     param->t_ref = 2 * PI * param->radius / param->velocity;
 
     param->terminal_velocity = (1 - (1 / param->beta)) * param->systemtime * -9.81;
@@ -555,12 +555,12 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
     {
         if ( param->outputinterval <= 0 )
             param->outputinterval = 0;
-        
-        // If the absolute time between outputs is smaller than dt (the iteration) 
+
+        // If the absolute time between outputs is smaller than dt (the iteration)
         // exit with error.
-        if ( param->outputinterval * param->t_ref / param->dt < 1 ) 
+        if ( param->outputinterval * param->t_ref / param->dt < 1 )
         {
-            printf( "Error: outputcycle is smaller than 1: %g.\n"     
+            printf( "Error: outputcycle is smaller than 1: %g.\n"
                     "       Please lower dtscale to accomodate.\n", param->outputinterval * param->t_ref / param->dt );
             exit(1);
         }
@@ -574,7 +574,7 @@ void parse( int argc, char* argv[], Vortex3dParam *param ) {
 
 ///////////////////////////
 // Parse formatted strings
-void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
+void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid,
                              TDelimiter *delimiter, double *dx, double *dy, double *dz )
 {
     double x1, x2, y1, y2, z1, z2;
@@ -618,11 +618,11 @@ void printParam( const Vortex3dParam &param )
 }
 
 // Use the frobenius norm to get a value for the difference between two matrices
-double fro_diff( const ScalarField &firstField, const ScalarField &secondField ) 
+double fro_diff( const ScalarField &firstField, const ScalarField &secondField )
 {
     double sum = 0;
     int i,j,k;
-#pragma omp parallel for shared(firstField, secondField) private(i, j, k) reduction(+: sum) 
+#pragma omp parallel for shared(firstField, secondField) private(i, j, k) reduction(+: sum)
     for ( i = 0; i < firstField.shape()(0); i++ )
     {
         for ( j = 0; j < firstField.shape()(1); j++ )
@@ -643,8 +643,8 @@ double dist_diff ( const ParticleArray &current, const ParticleArray &final )
 {
     double sum = 0;
     int i;
-#pragma omp parallel for shared(current, final) private(i) reduction(+: sum) 
-    for ( i = 0; i < final.getLength(); i++ ) 
+#pragma omp parallel for shared(current, final) private(i) reduction(+: sum)
+    for ( i = 0; i < final.getLength(); i++ )
         sum += abs(  ( getR(final.getParticle( i ).getPos()) - getR(current.getParticle( i ).getPos()) ) / getR( final.getParticle( i ).getPos() ) );
 
     return sum/final.getLength();

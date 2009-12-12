@@ -39,7 +39,7 @@ using blitz::TinyMatrix;
 ///////////////
 // Constructor
 Vortex::Vortex( const Vortex3dParam &param )
-{    
+{
     this->radius = param.radius;
     this->velocity = param.velocity;
     this->angle = param.angle;

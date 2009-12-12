@@ -29,25 +29,25 @@
 // Headers
 #include "TecplotOutput.h"
 
-#include "../ParticleArray.h" 
-#include "../Particle.h" 
-#include "../Vortex/Vortex.h" 
+#include "../ParticleArray.h"
+#include "../Particle.h"
+#include "../Vortex/Vortex.h"
 
 
-TecplotOutput::TecplotOutput( const Vortex3dParam &param, Vortex *the_vortex ) : 
-                          Output( param, the_vortex ) 
+TecplotOutput::TecplotOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
+                          Output( param, the_vortex )
 {
     f = fopen( param.datafile.c_str(), "w" );
 }
- 
+
 
 //////////////
 // Destructor
-TecplotOutput::~TecplotOutput() 
+TecplotOutput::~TecplotOutput()
 {
     fclose( f );
 }
-    
+
 
 inline void TecplotOutput::writeTrajectories( bool first_call, double time, const ParticleArray &particles )
 {

@@ -1,7 +1,7 @@
 /*
 GetOpt_pp:    Yet another C++ version of getopt.
     Copyright (C) 2007, 2008  Daniel Gutson, FuDePAN
-    
+
     This file is part of GetOpt_pp.
 
     GetOpt_pp is free software: you can redistribute it and/or modify
@@ -42,9 +42,9 @@ GETOPT_INLINE void GetOpt_pp::_parse(int argc, char* argv[])
     {
         const char current = argv[i][0];
         const char next = argv[i][1];
-        
+
         if (current == '-' && (isalpha(next) || next == '-' ) )
-        {            
+        {
             // see what's next, differentiate whether it's short or long:
             if (next == '-' && argv[i][2] != 0)
             {
@@ -70,11 +70,11 @@ GETOPT_INLINE void GetOpt_pp::_parse(int argc, char* argv[])
             // save value!
             if (currentData == NULL)
                 currentData = &_shortOps[EMPTY_OPTION];
-                
+
             currentData->args.push_back(argv[i]);
         }
     }
-    
+
     _last = _Option::OK;    // TODO: IMPROVE!!
 }
 
@@ -86,17 +86,17 @@ GETOPT_INLINE void GetOpt_pp::_parse_env()
     size_t var=0;
     std::string::size_type pos;
     OptionData* data;
-    
+
     while (environ[var] != NULL)
     {
         var_name = environ[var];
         pos = var_name.find('=');
-        
+
         if (pos != std::string::npos)
         {
             var_value = var_name.substr(pos+1);
             var_name = var_name.substr(0, pos);
-            
+
             if (_longOps.find(var_name) == _longOps.end())
             {
                 data = &_longOps[var_name];
@@ -106,7 +106,7 @@ GETOPT_INLINE void GetOpt_pp::_parse_env()
         }
         else
             (data = &_longOps[var_name])->flags = OptionData::Envir;
-            
+
         var++;
     }
 }
@@ -115,13 +115,13 @@ GETOPT_INLINE GetOpt_pp::GetOpt_pp(int argc, char* argv[])
     : _exc(std::ios_base::goodbit)
 {
     _init_flags();
-    _parse(argc, argv);    
+    _parse(argc, argv);
 }
 
 GETOPT_INLINE GetOpt_pp::GetOpt_pp(int argc, char* argv[], _EnvTag)
 {
     _init_flags();
-    _parse(argc, argv);    
+    _parse(argc, argv);
     _parse_env();
 }
 
@@ -130,41 +130,41 @@ GETOPT_INLINE GetOpt_pp& GetOpt_pp::operator >> (const _Option& opt) throw (GetO
     if (_last != _Option::ParsingError)
     {
         _last = opt(_shortOps, _longOps, _flags);
-        
+
         switch(_last)
         {
-            case _Option::OK: 
+            case _Option::OK:
                 break;
-                
+
             case _Option::OptionNotFound:
                 if (_exc & std::ios_base::eofbit )
                     throw OptionNotFoundEx();
                 break;
-                
+
             case _Option::BadType:
                 if (_exc & std::ios_base::failbit )
                     throw InvalidFormatEx();
                 break;
-                
+
             case _Option::NoArgs:
                 if (_exc & std::ios_base::eofbit )
                     throw ArgumentNotFoundEx();
                 break;
-                
+
             case _Option::TooManyArgs:
                 if (_exc & std::ios_base::failbit )
                     throw TooManyArgumentsEx();
                 break;
-            
+
             case _Option::OptionNotFound_NoEx:
                 break;  // Ok, it will be read by casting to bool
-                
+
             case _Option::ParsingError: break;    // just to disable warning
         }
     }
     else if (_exc & std::ios_base::failbit )
         throw ParsingErrorEx();
-        
+
     return *this;
 }
 
@@ -185,7 +185,7 @@ GETOPT_INLINE bool GetOpt_pp::options_remain() const
         remain = (it->second.flags == OptionData::CmdLine_NotExtracted);
         ++it;
     }
-    
+
     if (!remain)
     {
         LongOptions::const_iterator it = _longOps.begin();
@@ -195,7 +195,7 @@ GETOPT_INLINE bool GetOpt_pp::options_remain() const
             ++it;
         }
     }
-    
+
     return remain;
 }
 

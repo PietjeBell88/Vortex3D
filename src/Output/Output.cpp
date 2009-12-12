@@ -37,7 +37,7 @@
 
 //////////////
 // Constructor
-Output::Output( const Vortex3dParam &param, Vortex *the_vortex ) 
+Output::Output( const Vortex3dParam &param, Vortex *the_vortex )
 {
     this->outputtype = param.outputtype;
 
@@ -46,7 +46,7 @@ Output::Output( const Vortex3dParam &param, Vortex *the_vortex )
     this->dx = param.roi_dx;
     this->dy = param.roi_dy;
     this->dz = param.roi_dz;
-    
+
     this->timestep = param.outputinterval;
 
     this->the_vortex = the_vortex;
@@ -87,11 +87,11 @@ ScalarField Output::getConcentration( const ParticleArray &particles )
 }
 
 //
-void Output::printFileHeader() { 
+void Output::printFileHeader() {
 }
 
 //
-void Output::printFileFooter() { 
+void Output::printFileFooter() {
 }
 
 
@@ -117,7 +117,7 @@ void Output::writeToFile( double time, const ParticleArray &particles )
             break;
         default:
             std::cout << "ERROR: Unknown outputtype.";
-    } 
+    }
 
     first_call = false;
 }

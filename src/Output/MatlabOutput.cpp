@@ -29,16 +29,16 @@
 // Headers
 #include "MatlabOutput.h"
 
-#include "../Main.h" 
-#include "../ParticleArray.h" 
-#include "../Particle.h" 
-#include "../Vortex/Vortex.h" 
+#include "../Main.h"
+#include "../ParticleArray.h"
+#include "../Particle.h"
+#include "../Vortex/Vortex.h"
 
 
 ///////////////
 // Constructor
 MatlabOutput::MatlabOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
-                          Output( param, the_vortex ) 
+                          Output( param, the_vortex )
 {
     f = fopen( param.datafile.c_str(), "wb" );
 }
@@ -78,7 +78,7 @@ inline void MatlabOutput::writeTrajectories( bool first_call, double time, const
         const int & num = particles.getParticle( i ).getNum();
         const Vector3d & pos = particles.getParticle( i ).getPos();
         const double & speed = particles.getParticle( i ).speed();
-        
+
         double buf[] = {time, (double)num, pos(0), pos(1), pos(2), speed };
         fwrite( buf, 8, 6, f );
     }
@@ -112,8 +112,8 @@ inline void MatlabOutput::writeVelocityField( bool first_call, double time )
 
     // Write the time, and delimiter/grid values to file.
     // i.e. buf[] = { time, xmin, xstep, xmax, ymin, ystep, ymax, zmin, zstep, zmax }
-    double buf[] = { time, delimiter(0, 0), grid(0), delimiter(0, 1), 
-                    delimiter(1, 0), grid(1), delimiter(1, 1), 
+    double buf[] = { time, delimiter(0, 0), grid(0), delimiter(0, 1),
+                    delimiter(1, 0), grid(1), delimiter(1, 1),
                     delimiter(2, 0), grid(2), delimiter(2, 1) };
     fwrite( buf, 8, 10, f );
 
@@ -126,7 +126,7 @@ inline void MatlabOutput::writeVelocityField( bool first_call, double time )
             {
                 const Vector3d &vel = v(j, k, i);
                 double buf[] = { vel(0), vel(1), vel(2) };
-                fwrite( buf, 8, 3, f ); 
+                fwrite( buf, 8, 3, f );
             }
         }
     }

@@ -29,16 +29,16 @@
 // Headers
 #include "TextOutput.h"
 
-#include "../Main.h" 
-#include "../ParticleArray.h" 
-#include "../Particle.h" 
-#include "../Vortex/Vortex.h" 
+#include "../Main.h"
+#include "../ParticleArray.h"
+#include "../Particle.h"
+#include "../Vortex/Vortex.h"
 
 
 ///////////////
 // Constructor
 TextOutput::TextOutput( const Vortex3dParam &param, Vortex *the_vortex ) :
-                          Output( param, the_vortex ) 
+                          Output( param, the_vortex )
 {
     f = fopen( param.datafile.c_str(), "w" );
 }

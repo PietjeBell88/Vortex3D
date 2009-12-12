@@ -60,7 +60,7 @@ protected:
     TDelimiter delimiter; // The edges of the box.
     double dx, dy, dz; // The stepsizes.
     int p_N;
-    
+
     // Emitter rate
     double p_rate;
 

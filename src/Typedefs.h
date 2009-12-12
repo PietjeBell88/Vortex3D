@@ -41,3 +41,13 @@ typedef blitz::Array<double, 3> ScalarField;
 typedef blitz::Array<Vector3d, 3> VectorField;
 typedef blitz::TinyVector<int, 3> TGrid;
 typedef blitz::TinyMatrix<double, 3, 2> TDelimiter;
+
+//pow2
+inline double pow2( double c )
+{
+    return c*c;
+}
+inline double pow3( double c )
+{
+    return c*c*c;
+}

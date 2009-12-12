@@ -97,7 +97,7 @@ void show_help();
 
 void parse( int argc, char* argv[], Vortex3dParam *param );
 
-void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid, 
+void readGridDelimiterDelta( const string &fstring, const double &radius, TGrid *grid,
                              TDelimiter *delimiter, double *dx, double *dy, double *dz );
 
 void printParam( const Vortex3dParam &param );

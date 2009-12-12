@@ -51,7 +51,7 @@ const Particle &ParticleArray::getParticle( int p ) const
     return particles( p );
 }
 
-void ParticleArray::setParticle( int p, Particle particle ) 
+void ParticleArray::setParticle( int p, Particle particle )
 {
     this->particles( p ) = particle;
 }
