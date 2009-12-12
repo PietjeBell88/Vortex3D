@@ -77,11 +77,17 @@ Vector3d BurgersVortex::velocityCylinder( double r, double phi, double z )
 
 Vector3d BurgersVortex::dudtCylinder( double r, double phi, double z )
 {
-    /* check for r == 0, otherwise there's a "divide by zero" and the function
-     *  return NaN (inf * 0) */
-    return Vector3d( stretching_r * stretching_r * alpha * alpha * r,
-                     (r == 0) ? 0 : -((kappa * alpha * exp(-1 / 2 * alpha * r * r
-                             / fl_nu)) / fl_nu - (kappa * (1 - exp(-1 / 2 * alpha * r
-                             * r / fl_nu))) / (r * r)) * stretching_r * alpha * r,
-                     4 * stretching_z * stretching_z * alpha * alpha * z);
+    // Check for r == 0, and avoid the division by zero by removing all
+    // terms that have a division by r.
+    if ( r == 0 )
+    {
+        return Vector3d( 0,
+                         0,
+                         4 * pow2(stretching_z * alpha) * z );
+    }
+    else {
+        return Vector3d( pow2(stretching_r * alpha) * r - pow2( kappa * (1 - exp(-0.5 * alpha * pow2(r) / fl_nu))) / pow3(r),
+                         -1/fl_nu * stretching_r * pow2(alpha) * r * kappa * exp(-0.5 * alpha * pow2(r) / fl_nu),
+                         4 * pow2(stretching_z * alpha) * z );
+    }
 }

@@ -95,8 +95,8 @@ void moveParticles( Vortex *the_vortex, Emitter *the_emitter,
         const Vector3d & Du_Dt = the_vortex->getDuDtAt( p_pos );
 
         // Particle equation of motion.
-        const Vector3d dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5)
-                            * gravity + 1.5 / (beta + 0.5) * Du_Dt) * dt;
+        const Vector3d dv = (1 / tau_a * (v_vel - p_vel) + (beta - 1) / (beta + 0.5) * gravity 
+                            + 1.5 / (beta + 0.5) * Du_Dt) * dt;
 
         // Give the particle his new velocity and position.
         particle.setVel( p_vel + dv );
